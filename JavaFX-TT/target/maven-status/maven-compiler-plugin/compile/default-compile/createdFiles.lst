@@ -1,0 +1,5 @@
+app\App.class
+app\controllers\MainViewCtrl.class
+module-info.class
+app\controllers\MainViewCtrl$1.class
+app\workers\Wrk.class
