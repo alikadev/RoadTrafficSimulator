@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<AnchorPane id="AnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.controllers.MainViewCtrl">
+   <children>
+      <StackPane prefHeight="600.0" prefWidth="800.0">
+         <children>
+            <AnchorPane fx:id="layer">
+               <children>
+                  <ImageView fx:id="arrow" fitHeight="160.0" fitWidth="165.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../img/Arrow.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+   </children>
+</AnchorPane>
