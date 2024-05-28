@@ -3,3 +3,5 @@
 *.tmp
 *.txt
 *.bak
+*.properties
+/RoadTrafficSimulator/target/
