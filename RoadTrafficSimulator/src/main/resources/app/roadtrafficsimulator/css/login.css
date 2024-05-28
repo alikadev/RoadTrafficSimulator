@@ -3,3 +3,9 @@
     -fx-border-width: 2;
     -fx-border-radius: 2;
 }
+
+.field_error {
+    -fx-border-color: red;
+    -fx-border-width: 2;
+    -fx-border-radius: 2;
+}

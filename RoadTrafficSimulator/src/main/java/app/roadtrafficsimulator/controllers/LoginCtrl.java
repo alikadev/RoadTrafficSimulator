@@ -39,7 +39,42 @@ public class LoginCtrl implements IWrkCtrl {
 
     @FXML
     private void signIn(ActionEvent event) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        boolean failed = false;
+
+        // Clean fields styles
+        signinAccount.getStyleClass().removeAll("field_error");
+        signinPasswd.getStyleClass().removeAll("field_error");
+        signinPasswdCheck.getStyleClass().removeAll("field_error");
+
+        // Check if required fields are not empty
+        if (signinAccount.getText().isEmpty()) {
+            signinAccount.getStyleClass().add("field_error");
+            failed = true;
+        }
+
+        if (signinPasswd.getText().isEmpty()) {
+            signinPasswd.getStyleClass().add("field_error");
+            failed = true;
+        }
+
+        if (signinPasswdCheck.getText().isEmpty()) {
+            signinPasswdCheck.getStyleClass().add("field_error");
+            failed = true;
+        }
+
+        // Check if password and passwordCheck are the same
+        if (!signinPasswdCheck.getText().equals(signinPasswd.getText())) {
+            signinPasswdCheck.getStyleClass().add("field_error");
+        }
+
+        // Create the account
+        if (failed) return;
+        try {
+            Account account = new Account(signinAccount.getText(), signinPasswd.getText());
+            wrk.createAccount(account);
+        } catch (DBException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     public void setWrk(ICtrlWrk wrk) {
