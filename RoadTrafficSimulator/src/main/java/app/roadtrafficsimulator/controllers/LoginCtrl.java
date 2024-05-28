@@ -9,14 +9,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-import java.util.ArrayList;
-
 /**
  * The controller of the "Login and SignIn" view of the application.
  *
  * @author kucie
  */
-public class LoginCtrl implements IWrkCtrl {
+public class LoginCtrl implements ICtrl {
 
     /**
      * Create the login controller.
@@ -34,7 +32,33 @@ public class LoginCtrl implements IWrkCtrl {
     
     @FXML
     private void logIn(ActionEvent event) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        boolean failed = false;
+
+        // Clean fields styles
+        loginAccount.getStyleClass().removeAll("field_error");
+        loginAccount.getStyleClass().removeAll("field_error");
+
+        // Check if required fields are not empty
+        if (loginAccount.getText().isEmpty()) {
+            loginAccount.getStyleClass().add("field_error");
+            failed = true;
+        }
+
+        if (loginPasswd.getText().isEmpty()) {
+            loginPasswd.getStyleClass().add("field_error");
+            failed = true;
+        }
+
+        if (failed) return;
+
+        // Do check the password
+        try {
+            if (wrk.verifyAccount(new Account(loginAccount.getText(), loginPasswd.getText())))
+                System.out.println("OK");
+            else System.out.println("KO");
+        } catch (DBException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     @FXML

@@ -79,7 +79,7 @@ public class DBWrk {
      * @throws DBException The database Exception
      */
     public void insertAccount(Account account) throws DBException {
-        final String QUERY = "INSERT INTO Account VALUES (?, ?)";
+        final String QUERY = "INSERT INTO Account VALUES (?, ?);";
         try {
             // Check if DB connection is open
             if (connection == null || connection.isClosed())
@@ -88,6 +88,36 @@ public class DBWrk {
             PreparedStatement ps = connection.prepareStatement(QUERY);
             ps.setString(1, account.getName());
             ps.setString(2, account.getPassword());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
+        }
+    }
+
+    /**
+     * Verify if the password of the account is the same that the one in the DB.
+     * @param account The account. The password should already be hashed
+     * @throws DBException The database Exception
+     */
+    public boolean verifyAccount(Account account) throws DBException {
+        final String QUERY = "SELECT password LIKE ? AS result FROM account WHERE id = ?;";
+        try {
+            // Check if DB connection is open
+            if (connection == null || connection.isClosed())
+                throw new DBException("Database connection is not opened");
+
+            PreparedStatement ps = connection.prepareStatement(QUERY);
+            ps.setString(1, account.getPassword());
+            ps.setString(2, account.getName());
+            System.out.println("A");
+            ResultSet rs = ps.executeQuery();
+            System.out.println("B");
+
+            if (!rs.next())
+                throw new DBException("Account does not exists");
+            System.out.println("C");
+
+            return rs.getInt(1) == 1;
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }

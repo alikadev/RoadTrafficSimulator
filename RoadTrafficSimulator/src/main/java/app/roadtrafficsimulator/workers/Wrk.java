@@ -35,9 +35,15 @@ public class Wrk implements ICtrlWrk {
 
     @Override
     public void createAccount(Account account) throws DBException {
-        // TODO: Hash the password of the account
+        account.setPassword(HashWrk.hash(account.getPassword()));
         db.insertAccount(account);
         this.account = account;
+    }
+
+    @Override
+    public boolean verifyAccount(Account account) throws DBException {
+        account.setPassword(HashWrk.hash(account.getPassword()));
+        return db.verifyAccount(account);
     }
 
     public void setCtrl(IWrkCtrl ctrl) {

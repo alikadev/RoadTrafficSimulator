@@ -12,7 +12,7 @@ select * from Setting;
 
 -- ======== NON-DUMMIES ======== --
 -- Select password from account's id
-SELECT password FROM Account WHERE id = "abc";
+SELECT password LIKE "123" AS result FROM account WHERE id = "abc";
 
 -- Insert an account
 INSERT INTO Account VALUES ("abc", "123");
@@ -25,7 +25,7 @@ SELECT
 	st.id AS setting,
     CASE WHEN acst.value IS NULL THEN st.default ELSE acst.value END AS value
 FROM AccountSetting AS acst
-RIGHT JOIN Setting AS st 
+LEFT JOIN Setting AS st 
 	ON acst.setting = st.id 
 	AND acst.account = "abc" 
 	AND acst.setname = "S3";

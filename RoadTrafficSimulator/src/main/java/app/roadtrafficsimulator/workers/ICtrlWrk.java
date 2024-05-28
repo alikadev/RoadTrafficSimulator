@@ -13,4 +13,5 @@ import app.roadtrafficsimulator.exceptions.DBException;
  */
 public interface ICtrlWrk {
     void createAccount(Account account) throws DBException;
+    boolean verifyAccount(Account account) throws DBException;
 }
