@@ -6,9 +6,7 @@ import app.roadtrafficsimulator.exceptions.DBException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Properties;
 
 /**
@@ -81,12 +79,15 @@ public class DBWrk {
      * @throws DBException The database Exception
      */
     public void insertAccount(Account account) throws DBException {
+        final String QUERY = "INSERT INTO Account VALUES (?, ?)";
         try {
             // Check if DB connection is open
             if (connection == null || connection.isClosed())
                 throw new DBException("Database connection is not opened");
 
-
+            PreparedStatement ps = connection.prepareStatement(QUERY);
+            ps.setString(1, account.getName());
+            ps.setString(2, account.getPassword());
         } catch (SQLException e) {
             throw new DBException(e.getMessage());
         }
