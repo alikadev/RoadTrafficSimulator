@@ -44,7 +44,7 @@ public class DBWrk {
             port = prop.getProperty("port");
 
         } catch (IOException e) {
-            throw new DBException(e.getMessage());
+            throw new DBException("Un problème est apparu durant la lecture du fichier de propriétés: " + e.getMessage());
         }
 
         final String jdbcUrl = "jdbc:" + type + "://" + host + ":" + port + "/" + database + "?serverTimezone=CET";
@@ -56,7 +56,7 @@ public class DBWrk {
             // Open connection
             connection = DriverManager.getConnection(jdbcUrl, user, passwd);
         } catch (ClassNotFoundException | SQLException e) {
-            throw new DBException("No driver = " + e.getMessage());
+            throw new DBException("Problème durant la connection à la base de donnée: " + e.getMessage());
         }
     }
 
@@ -69,7 +69,7 @@ public class DBWrk {
             if (connection != null && !connection.isClosed())
                 connection.close();
         } catch (SQLException e) {
-            throw new DBException(e.getMessage());
+            throw new DBException("Un problème est apparu durant la fermeture de la connection à la base de donnée: " + e.getMessage());
         }
     }
 
@@ -83,14 +83,16 @@ public class DBWrk {
         try {
             // Check if DB connection is open
             if (connection == null || connection.isClosed())
-                throw new DBException("Database connection is not opened");
+                throw new DBException("La connection à la base de donnée n'a pas été ouverte");
 
+            // Create and process the request
             PreparedStatement ps = connection.prepareStatement(QUERY);
             ps.setString(1, account.getName());
             ps.setString(2, account.getPassword());
             ps.executeUpdate();
+            
         } catch (SQLException e) {
-            throw new DBException(e.getMessage());
+            throw new DBException("Un problème est apparu durant la création du compte: " + e.getMessage());
         }
     }
 
@@ -104,22 +106,22 @@ public class DBWrk {
         try {
             // Check if DB connection is open
             if (connection == null || connection.isClosed())
-                throw new DBException("Database connection is not opened");
+                throw new DBException("La connection à la base de donnée n'a pas été ouverte");
 
+            // Create and process the request
             PreparedStatement ps = connection.prepareStatement(QUERY);
             ps.setString(1, account.getPassword());
             ps.setString(2, account.getName());
-            System.out.println("A");
             ResultSet rs = ps.executeQuery();
-            System.out.println("B");
 
+            // Check if the request exist
             if (!rs.next())
-                throw new DBException("Account does not exists");
-            System.out.println("C");
+                throw new DBException("Le compte " + account.getName() + " n'existe pas dans la base de donnée!");
 
+            // Return result (1 = true, 0 = false)
             return rs.getInt(1) == 1;
         } catch (SQLException e) {
-            throw new DBException(e.getMessage());
+            throw new DBException("Un problème est apparue durant la vérification du compte: " + e.getMessage());
         }
     }
 
