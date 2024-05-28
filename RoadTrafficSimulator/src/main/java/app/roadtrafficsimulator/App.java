@@ -1,5 +1,6 @@
 package app.roadtrafficsimulator;
 
+import app.roadtrafficsimulator.controllers.ICtrl;
 import app.roadtrafficsimulator.controllers.LoginCtrl;
 import app.roadtrafficsimulator.workers.Wrk;
 import javafx.application.Application;
@@ -33,7 +34,7 @@ public class App extends Application {
         }
 
         Wrk wrk = new Wrk(getClass().getResource(DB_CONFIG_LOCALHOST));
-        LoginCtrl ctrl = loader.getController();
+        ICtrl ctrl = loader.getController();
         ctrl.setWrk(wrk);
         wrk.setCtrl(ctrl);
         Scene scene = new Scene(mainView, 800, 600);
