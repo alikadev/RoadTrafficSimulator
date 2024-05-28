@@ -2,12 +2,15 @@ package app.roadtrafficsimulator.controllers;
 
 import app.roadtrafficsimulator.beans.Account;
 import app.roadtrafficsimulator.exceptions.DBException;
+import app.roadtrafficsimulator.exceptions.LoginException;
+import app.roadtrafficsimulator.helper.EasyPopup;
 import app.roadtrafficsimulator.workers.ICtrlWrk;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Popup;
 
 /**
  * The controller of the "Login and SignIn" view of the application.
@@ -51,13 +54,14 @@ public class LoginCtrl implements ICtrl {
 
         if (failed) return;
 
-        // Do check the password
         try {
-            if (wrk.verifyAccount(new Account(loginAccount.getText(), loginPasswd.getText())))
-                System.out.println("OK");
-            else System.out.println("KO");
-        } catch (DBException e) {
-            System.err.println(e.getMessage());
+            // Vérification du mot de passe
+            if (!wrk.verifyAccount(new Account(loginAccount.getText(), loginPasswd.getText())))
+                throw new LoginException("Le nom du compte et/ou le mot de passe ne sont pas le bon");
+
+            EasyPopup.displayInfo("Succès", "Succès durant la connection", "Vous êtes bel et bien connecté", true);
+        } catch (LoginException | DBException e) {
+            EasyPopup.displayError("Erreur", "Erreur durant la connection", e.getMessage(), true);
         }
     }
 
@@ -91,13 +95,15 @@ public class LoginCtrl implements ICtrl {
             signinPasswdCheck.getStyleClass().add("field_error");
         }
 
-        // Create the account
         if (failed) return;
+
+        // Create the account
         try {
             Account account = new Account(signinAccount.getText(), signinPasswd.getText());
             wrk.createAccount(account);
+            EasyPopup.displayInfo("Succès", "Succès lors de la création du compte", "Votre compte à bel et bien été créer!", true);
         } catch (DBException e) {
-            System.err.println(e.getMessage());
+            EasyPopup.displayError("Erreur", "Erreur durant la création du compte.", e.getMessage(), true);
         }
     }
 

@@ -8,8 +8,9 @@ import app.roadtrafficsimulator.beans.Account;
 import app.roadtrafficsimulator.exceptions.DBException;
 
 /**
+ * Interface du controller envers le worker
  *
- * @author kucie
+ * @author Elvin Kuci
  */
 public interface ICtrlWrk {
     void createAccount(Account account) throws DBException;

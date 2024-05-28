@@ -2,6 +2,8 @@ package app.roadtrafficsimulator;
 
 import app.roadtrafficsimulator.controllers.ICtrl;
 import app.roadtrafficsimulator.controllers.LoginCtrl;
+import app.roadtrafficsimulator.exceptions.DBException;
+import app.roadtrafficsimulator.helper.EasyPopup;
 import app.roadtrafficsimulator.workers.Wrk;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -9,7 +11,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * JavaFX App
@@ -22,6 +26,11 @@ public class App extends Application {
     
     @Override
     public void start(Stage stage) {
+        // Check config file paths
+        URL dbConfig = getClass().getResource(DB_CONFIG_LOCALHOST);
+        if (dbConfig == null) throw new RuntimeException("Le fichier de configuration de la base de donnée n'a pas été trouvé!");
+
+        // Load the view
         FXMLLoader loader;
         Parent mainView;
         try {
@@ -33,7 +42,8 @@ public class App extends Application {
             return;
         }
 
-        Wrk wrk = new Wrk(getClass().getResource(DB_CONFIG_LOCALHOST));
+        // Init MVC2
+        Wrk wrk = new Wrk(dbConfig);
         ICtrl ctrl = loader.getController();
         ctrl.setWrk(wrk);
         wrk.setCtrl(ctrl);
@@ -41,15 +51,21 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setResizable(true);
         stage.setTitle(TITLE);
-        
+
+        // Manage common interrupts
         stage.setOnCloseRequest(e -> {
             e.consume();
             wrk.terminate();
             ctrl.terminate();
         });
 
-        ctrl.start();
-        wrk.start();
-        stage.show();
+        // Start!
+        try {
+            ctrl.start();
+            wrk.start();
+            stage.show();
+        } catch (DBException e) {
+            EasyPopup.displayError("Erreur fatal", "Un problème s'est produit durant le lancement de l'application", e.getMessage(), true);
+        }
     }
 }

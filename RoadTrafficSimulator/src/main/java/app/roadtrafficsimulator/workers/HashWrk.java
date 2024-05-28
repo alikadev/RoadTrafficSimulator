@@ -1,5 +1,7 @@
 package app.roadtrafficsimulator.workers;
 
+import app.roadtrafficsimulator.exceptions.UnexpectedException;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,7 +18,7 @@ public class HashWrk {
             return Base64.getEncoder().encodeToString(digest);
 
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Unreachable");
+            throw new UnexpectedException(e.getMessage());
         }
     }
 }
