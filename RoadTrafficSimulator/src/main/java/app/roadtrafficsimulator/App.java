@@ -1,6 +1,7 @@
 package app.roadtrafficsimulator;
 
-import app.roadtrafficsimulator.controllers.IAppCtrl;
+import app.roadtrafficsimulator.controllers.LoginCtrl;
+import app.roadtrafficsimulator.workers.Wrk;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,6 +15,7 @@ import java.io.IOException;
  */
 public class App extends Application {
 
+    private static final String DB_CONFIG_LOCALHOST = "config/db/localhost.properties";
     private static final String FXML = "views/Login.fxml";
     private static final String TITLE = "Road Traffic Simulator";
     
@@ -29,8 +31,11 @@ public class App extends Application {
             System.err.println(e.getCause().getMessage()); 
             return;
         }
-        
-        IAppCtrl ctrl = loader.getController();
+
+        Wrk wrk = new Wrk(getClass().getResource(DB_CONFIG_LOCALHOST));
+        LoginCtrl ctrl = loader.getController();
+        ctrl.setWrk(wrk);
+        wrk.setCtrl(ctrl);
         Scene scene = new Scene(mainView, 800, 600);
         stage.setScene(scene);
         stage.setResizable(true);
@@ -38,10 +43,12 @@ public class App extends Application {
         
         stage.setOnCloseRequest(e -> {
             e.consume();
+            wrk.terminate();
             ctrl.terminate();
         });
-        
+
         ctrl.start();
+        wrk.start();
         stage.show();
     }
 }

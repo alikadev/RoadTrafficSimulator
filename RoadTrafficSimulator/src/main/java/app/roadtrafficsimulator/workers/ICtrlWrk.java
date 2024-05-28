@@ -4,10 +4,13 @@
  */
 package app.roadtrafficsimulator.workers;
 
+import app.roadtrafficsimulator.beans.Account;
+import app.roadtrafficsimulator.exceptions.DBException;
+
 /**
  *
  * @author kucie
  */
 public interface ICtrlWrk {
-    
+    void createAccount(Account account) throws DBException;
 }

@@ -1,7 +1,5 @@
-/*
- * Empty Stylesheet file.
- */
-
-#root {
-   -fx-background-color: #ff00ff;
+.side {
+    -fx-border-color: blue;
+    -fx-border-width: 2;
+    -fx-border-radius: 2;
 }
