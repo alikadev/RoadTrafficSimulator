@@ -17,12 +17,8 @@ public class Wrk implements ICtrlWrk {
         account = null;
     }
 
-    public void start() throws RuntimeException {
-        try {
-            db.start();
-        } catch (DBException e) {
-            throw  new RuntimeException(e);
-        }
+    public void start() throws DBException {
+        db.start();
     }
 
     public void terminate() throws RuntimeException {
