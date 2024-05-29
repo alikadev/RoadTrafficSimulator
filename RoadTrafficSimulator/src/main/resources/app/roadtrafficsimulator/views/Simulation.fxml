@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.net.URL?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="app.roadtrafficsimulator.controllers.SimulationCtrl"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.roadtrafficsimulator.controllers.SimulationCtrl">
     <stylesheets>
         <URL value="@/app/roadtrafficsimulator/css/simulation.css" />
     </stylesheets>
+   <center>
+      <StackPane BorderPane.alignment="CENTER">
+         <children>
+            <AnchorPane fx:id="foreground" />
+            <AnchorPane fx:id="background" />
+         </children>
+      </StackPane>
+   </center>
+   <right>
+      <TabPane fx:id="editMenu" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+   </right>
 </BorderPane>

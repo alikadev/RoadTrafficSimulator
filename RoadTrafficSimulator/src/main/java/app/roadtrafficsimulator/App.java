@@ -54,10 +54,9 @@ public class App extends Application {
         });
 
         // Load the basic view
-        loadView(LOGIN_VIEW);
+        loadView(SIMULATION_VIEW);
         // Start!
         try {
-            ctrl.start();
             wrk.start();
             stage.show();
         } catch (DBException e) {
@@ -86,6 +85,8 @@ public class App extends Application {
         double height = scene == null ? 600 : scene.getHeight();
         scene = new Scene(view, width, height);
         stage.setScene(scene);
+
+        ctrl.start();
     }
 
     private ICtrl ctrl;

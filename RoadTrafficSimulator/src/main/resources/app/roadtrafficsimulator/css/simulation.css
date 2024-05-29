@@ -1,0 +1,15 @@
+.yellow {
+    -fx-background-color: yellow;
+}
+
+Button {
+    -fx-padding: 5;
+}
+
+.tab_content {
+    -fx-padding: 10;
+    -fx-background-color: white;
+    -fx-border-style: none none none solid;
+    -fx-border-width: 1;
+    -fx-border-color: lightgray;
+}
