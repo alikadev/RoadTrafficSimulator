@@ -1,5 +1,6 @@
 package app.roadtrafficsimulator.controllers;
 
+import app.roadtrafficsimulator.App;
 import app.roadtrafficsimulator.beans.Account;
 import app.roadtrafficsimulator.exceptions.DBException;
 import app.roadtrafficsimulator.exceptions.LoginException;
@@ -59,7 +60,7 @@ public class LoginCtrl implements ICtrl {
             if (!wrk.verifyAccount(new Account(loginAccount.getText(), loginPasswd.getText())))
                 throw new LoginException("Le nom du compte et/ou le mot de passe ne sont pas le bon");
 
-            EasyPopup.displayInfo("Succès", "Succès durant la connection", "Vous êtes bel et bien connecté", true);
+            nextView();
         } catch (LoginException | DBException e) {
             EasyPopup.displayError("Erreur", "Erreur durant la connection", e.getMessage(), true);
         }
@@ -101,22 +102,33 @@ public class LoginCtrl implements ICtrl {
         try {
             Account account = new Account(signinAccount.getText(), signinPasswd.getText());
             wrk.createAccount(account);
-            EasyPopup.displayInfo("Succès", "Succès lors de la création du compte", "Votre compte à bel et bien été créer!", true);
+            nextView();
         } catch (DBException e) {
             EasyPopup.displayError("Erreur", "Erreur durant la création du compte.", e.getMessage(), true);
         }
     }
 
+    private void nextView() {
+        app.loadView(App.SIMULATION_VIEW);
+    }
+
+    @Override
+    public void setApp(App app) {
+        this.app = app;
+    }
+
     public void setWrk(ICtrlWrk wrk) {
         this.wrk = wrk;
     }
-    
+
     /**
      * The reference to the current worker.
      */
     ICtrlWrk wrk;
-    
-
+    /**
+     * The reference to the current worker.
+     */
+    App app;
     /**
      * The login's side "Account" textfield
      */
