@@ -1,9 +1,12 @@
 package app.roadtrafficsimulator.controllers;
 
 import app.roadtrafficsimulator.App;
+import app.roadtrafficsimulator.beans.Circuit;
+import app.roadtrafficsimulator.beans.Roadable;
 import app.roadtrafficsimulator.helper.FX;
 import app.roadtrafficsimulator.workers.ICtrlWrk;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -57,6 +60,15 @@ public class SimulationCtrl implements ICtrl {
         );
     }
 
+    @FXML
+    public void toggleSimulation(ActionEvent ev) {
+        editMenu.setVisible(!editMenu.isVisible());
+        if (editMenu.isVisible())
+            simulationBtn.setText("Démarrer la simulation");
+        else
+            simulationBtn.setText("Arrêter la simulation");
+    }
+
     private void loadSettings(MouseEvent ev) {
     }
 
@@ -80,7 +92,10 @@ public class SimulationCtrl implements ICtrl {
     public void start() {
         editMenu.getTabs().add(settingsTab);
         editMenu.getTabs().add(generalTab);
-        System.out.println(editMenu.getTabs().get(0));
+        Circuit c = wrk.getCircuit();
+        for (Roadable rd : c.getRoads()) {
+            throw new RuntimeException("Not implemented yet");
+        }
     }
 
     @Override
@@ -115,6 +130,12 @@ public class SimulationCtrl implements ICtrl {
      */
     @FXML
     private TabPane editMenu;
+
+    /**
+     * The button used to toggle the simulation state.
+     */
+    @FXML
+    private Button simulationBtn;
 
     private Tab settingsTab;
     private Tab generalTab;

@@ -5,6 +5,7 @@
 package app.roadtrafficsimulator.workers;
 
 import app.roadtrafficsimulator.beans.Account;
+import app.roadtrafficsimulator.beans.Circuit;
 import app.roadtrafficsimulator.exceptions.DBException;
 
 /**
@@ -15,4 +16,5 @@ import app.roadtrafficsimulator.exceptions.DBException;
 public interface ICtrlWrk {
     void createAccount(Account account) throws DBException;
     boolean verifyAccount(Account account) throws DBException;
+    Circuit getCircuit();
 }

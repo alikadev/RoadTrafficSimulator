@@ -1,5 +1,6 @@
 package app.roadtrafficsimulator.beans;
 
+import app.roadtrafficsimulator.exceptions.UnexpectedException;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -138,6 +139,21 @@ public class Road implements Roadable {
      */
     public Vec2 getPosition() {
         return backPosition;
+    }
+
+    /**
+     * Returns the head position of the road.
+     *
+     * @return the head position of the road
+     */
+    public Vec2 getEndPosition() {
+        switch (direction) {
+            case TOP: return new Vec2(backPosition.getX(), backPosition.getY() - size.getValue());
+            case DOWN: return new Vec2(backPosition.getX(), backPosition.getY() + size.getValue());
+            case LEFT: return new Vec2(backPosition.getX() - size.getValue(), backPosition.getY());
+            case RIGHT: return new Vec2(backPosition.getX() + size.getValue(), backPosition.getY());
+        }
+        throw new UnexpectedException("Unexpected direction value");
     }
 
     /**
