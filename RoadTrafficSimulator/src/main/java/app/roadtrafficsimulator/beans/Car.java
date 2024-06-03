@@ -2,6 +2,7 @@ package app.roadtrafficsimulator.beans;
 
 import app.roadtrafficsimulator.exceptions.UnexpectedException;
 import app.roadtrafficsimulator.helper.FX;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
@@ -12,7 +13,6 @@ import javafx.scene.transform.Scale;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Represents a car with various physical properties and implements the Vehicle interface.
@@ -28,24 +28,26 @@ public class Car implements Vehicle {
      * An instance of this car will be able to be drawn because the texture is not set.
      *
      * @param reactionTime the reaction time of the car (in seconds)
-     * @param decelerationSpeed the deceleration speed of the car (in meters per second squared)
+     * @param deceleration the deceleration speed of the car (in meters per second squared)
      * @param breakingSpeed the emergency braking speed of the car (in meters per second squared)
      * @param acceleration the acceleration of the car (in meters per second squared)
      * @param securityTime the security time of the car (in seconds)
      */
-    public Car(double reactionTime, double decelerationSpeed, double breakingSpeed, double acceleration, double securityTime) {
+    public Car(double reactionTime, double deceleration, double breakingSpeed, double acceleration, double securityTime) {
         this.reactionTime = new InputField("Temps de réaction (s)", reactionTime);
-        this.decelerationSpeed = new InputField("Décélération (m/s^2)", decelerationSpeed);
+        this.deceleration = new InputField("Décélération (m/s^2)", deceleration);
         this.breakingSpeed = new InputField("Décélération d'urgence (m/s^2)", breakingSpeed);
         this.acceleration = new InputField("Accélération (m/s^2)", acceleration);
         this.securityTime = new InputField("Temps de sécurité (s)", securityTime);
 
         props = new ArrayList<>();
         props.add(this.reactionTime);
-        props.add(this.decelerationSpeed);
+        props.add(this.deceleration);
         props.add(this.breakingSpeed);
         props.add(this.acceleration);
         props.add(this.securityTime);
+
+        speed = 0;
     }
 
     /**
@@ -55,16 +57,16 @@ public class Car implements Vehicle {
      * @param car The car that will be deeply copied
      * @param rd The current road
      */
-    public Car(ImageView iv, Car car, Road rd) {
+    public Car(ImageView iv, Car car, Roadable rd) {
         this.reactionTime = new InputField(car.reactionTime.getValueLabel(), car.reactionTime.getValue());
-        this.decelerationSpeed = new InputField(car.decelerationSpeed.getValueLabel(), car.decelerationSpeed.getValue());
+        this.deceleration = new InputField(car.deceleration.getValueLabel(), car.deceleration.getValue());
         this.breakingSpeed = new InputField(car.breakingSpeed.getValueLabel(), car.breakingSpeed.getValue());
         this.acceleration = new InputField(car.acceleration.getValueLabel(), car.acceleration.getValue());
         this.securityTime = new InputField(car.securityTime.getValueLabel(), car.securityTime.getValue());
 
         props = new ArrayList<>();
         props.add(this.reactionTime);
-        props.add(this.decelerationSpeed);
+        props.add(this.deceleration);
         props.add(this.breakingSpeed);
         props.add(this.acceleration);
         props.add(this.securityTime);
@@ -73,6 +75,8 @@ public class Car implements Vehicle {
 
         this.road = rd;
         position = new Vec2(road.getStartPosition());
+
+        speed = this.road.getSpeedLimit();
     }
 
     @Override
@@ -110,6 +114,7 @@ public class Car implements Vehicle {
      *
      * @return the road the car is on
      */
+    @Override
     public Roadable getRoad() {
         return road;
     }
@@ -119,6 +124,7 @@ public class Car implements Vehicle {
      *
      * @param road the new road the car is on
      */
+    @Override
     public void setRoad(Roadable road) {
         this.road = road;
     }
@@ -128,6 +134,7 @@ public class Car implements Vehicle {
      *
      * @return the position of the car
      */
+    @Override
     public Vec2 getPosition() {
         return position;
     }
@@ -137,6 +144,7 @@ public class Car implements Vehicle {
      *
      * @param position the new position of the car
      */
+    @Override
     public void setPosition(Vec2 position) {
         this.position = position;
     }
@@ -146,8 +154,9 @@ public class Car implements Vehicle {
      *
      * @return the reaction time of the car
      */
-    public InputField getReactionTime() {
-        return reactionTime;
+    @Override
+    public double getReactionTime() {
+        return reactionTime.getValue();
     }
 
     /**
@@ -155,8 +164,9 @@ public class Car implements Vehicle {
      *
      * @return the deceleration speed of the car
      */
-    public InputField getDecelerationSpeed() {
-        return decelerationSpeed;
+    @Override
+    public double getDeceleration() {
+        return deceleration.getValue();
     }
 
     /**
@@ -164,8 +174,9 @@ public class Car implements Vehicle {
      *
      * @return the emergency braking speed of the car
      */
-    public InputField getBreakingSpeed() {
-        return breakingSpeed;
+    @Override
+    public double getBreakingSpeed() {
+        return breakingSpeed.getValue();
     }
 
     /**
@@ -173,8 +184,9 @@ public class Car implements Vehicle {
      *
      * @return the acceleration of the car
      */
-    public InputField getAcceleration() {
-        return acceleration;
+    @Override
+    public double getAcceleration() {
+        return acceleration.getValue();
     }
 
     /**
@@ -182,8 +194,19 @@ public class Car implements Vehicle {
      *
      * @return the security time of the car
      */
-    public InputField getSecurityTime() {
-        return securityTime;
+    @Override
+    public double getSecurityTime() {
+        return securityTime.getValue();
+    }
+
+    @Override
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    @Override
+    public double getSpeed() {
+        return speed;
     }
 
     @Override
@@ -213,7 +236,7 @@ public class Car implements Vehicle {
     /**
      * The deceleration speed of the car.
      */
-    private InputField decelerationSpeed;
+    private InputField deceleration;
 
     /**
      * The emergency braking speed of the car.
@@ -234,4 +257,9 @@ public class Car implements Vehicle {
      * The list of all properties of the car.
      */
     private List<InputField> props;
+
+    /**
+     * The current speed of the car
+     */
+    private double speed;
 }

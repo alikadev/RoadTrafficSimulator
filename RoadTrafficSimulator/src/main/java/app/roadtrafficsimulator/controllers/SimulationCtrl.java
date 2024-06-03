@@ -86,10 +86,12 @@ public class SimulationCtrl implements ICtrl {
         if (editMenu.isVisible()) {
             simulationBtn.setText("Démarrer la simulation");
             editMenu.setPrefWidth(200);
+            wrk.stopSimulation();
         }
         else {
             simulationBtn.setText("Arrêter la simulation");
             editMenu.setPrefWidth(0);
+            wrk.startSimulation();
         }
     }
 
@@ -162,16 +164,10 @@ public class SimulationCtrl implements ICtrl {
         editMenu.getTabs().add(generalTab);
 
         // Draw roads
-        render();
+        renderRoads();
 
         // First update of the pixel per meter
         updatePixelPerMeter(null);
-    }
-
-    @Override
-    public void render() {
-        renderRoads();
-        renderVehicles();
     }
 
     /**
@@ -189,19 +185,23 @@ public class SimulationCtrl implements ICtrl {
         }
     }
 
-    /**
-     * render the vehicles of the circuit.
-     */
-    public void renderVehicles() {
-        Circuit c = wrk.getCircuit();
-        foreground.getChildren().clear();
-        for (Vehicle v : c.getVehicles()) {
+    @Override
+    public void addVehicle(Vehicle v) {
+        Platform.runLater(() -> {
             Node node = v.draw();
             node.setOnMouseClicked(this::editRoad);
             node.translateXProperty().bind(foreground.widthProperty().divide(2.f));
             node.translateYProperty().bind(foreground.heightProperty().divide(2.f));
             foreground.getChildren().add(node);
-        }
+        });
+    }
+
+    @Override
+    public void removeVehicle(Vehicle v) {
+        Platform.runLater(() -> {
+            Node vn = v.draw();
+            foreground.getChildren().remove(vn);
+        });
     }
 
     @Override

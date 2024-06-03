@@ -60,4 +60,21 @@ public interface Roadable {
      * See the <a href="https://ge.ch/grandconseil/data/texte/PL12730A.pdf">source</a> here
      */
     static double WIDTH = (6.4 * Physics.METER) / 2;
+
+    /**
+     * Get the road speed limit.
+     *
+     * @return The speed limit in (m/s)
+     */
+    double getSpeedLimit();
+
+    /**
+     * Move the vehicle on the road. Might change the vehicle's road or request
+     * to be destroyed (end of road).
+     * @param v The vehicle to move
+     * @param distance The distance to move
+     *
+     * @return False if the vehicle finished it's course
+     */
+    boolean moveVehicle(Vehicle v, double distance);
 }

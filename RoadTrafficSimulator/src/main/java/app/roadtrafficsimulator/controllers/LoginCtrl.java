@@ -2,6 +2,7 @@ package app.roadtrafficsimulator.controllers;
 
 import app.roadtrafficsimulator.App;
 import app.roadtrafficsimulator.beans.Account;
+import app.roadtrafficsimulator.beans.Vehicle;
 import app.roadtrafficsimulator.exceptions.DBException;
 import app.roadtrafficsimulator.exceptions.LoginException;
 import app.roadtrafficsimulator.exceptions.UnexpectedException;
@@ -110,8 +111,13 @@ public class LoginCtrl implements ICtrl {
     }
 
     @Override
-    public void render() {
-        throw new UnexpectedException("Nothing to render on the login view...");
+    public void addVehicle(Vehicle v) {
+        throw new UnexpectedException("You can't add a vehicle on the login view...");
+    }
+
+    @Override
+    public void removeVehicle(Vehicle v) {
+        throw new UnexpectedException("You can't remove a vehicle from the login view...");
     }
 
     private void nextView() {

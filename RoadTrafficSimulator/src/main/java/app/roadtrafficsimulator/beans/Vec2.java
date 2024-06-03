@@ -94,6 +94,15 @@ public class Vec2 {
     }
 
     /**
+     * Get the normalized vector.
+     * @return The length of the vector.
+     */
+    public Vec2 normal() {
+        double length = length();
+        return new Vec2(x/length, y/length);
+    }
+
+    /**
      * Get the X coordinate.
      * @return The X coordinate.
      */

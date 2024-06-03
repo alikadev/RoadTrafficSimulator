@@ -118,6 +118,29 @@ public class Road implements Roadable {
         throw new UnexpectedException("Not all direction are managed up here!");
     }
 
+    @Override
+    public boolean moveVehicle(Vehicle v, double distance) {
+        Vec2 end = getEndPosition();
+        Vec2 endVector = end.sub(v.getPosition());
+        double endDistance = endVector.length();
+
+        // Check if we finish this road "tile"
+        if (endDistance < distance) {
+            // Check if road is finished
+            if (next == null)
+                return false;
+
+            // Switch to next road and continue updating...
+            v.setRoad(next);
+            return next.moveVehicle(v, distance - endDistance);
+        }
+
+        // Calculate new position
+        Vec2 change = endVector.normal().mul(distance);
+        v.setPosition(v.getPosition().add(change));
+        return true;
+    }
+
     /**
      * Get the next road.
      * @return The next road.
@@ -139,8 +162,8 @@ public class Road implements Roadable {
      *
      * @return the speed limit input field of the road
      */
-    public InputField getSpeedLimit() {
-        return speedLimit;
+    public double getSpeedLimit() {
+        return speedLimit.getValue();
     }
 
     /**

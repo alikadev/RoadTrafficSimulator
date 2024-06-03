@@ -1,10 +1,16 @@
 package app.roadtrafficsimulator.controllers;
 
 import app.roadtrafficsimulator.beans.Circuit;
+import app.roadtrafficsimulator.beans.Vehicle;
 
 public interface IWrkCtrl {
     /**
-     * Render the current state of the simulation.
+     * Render a vehicle on the screen.
      */
-    void render();
+    void addVehicle(Vehicle v);
+
+    /**
+     * Destroy a vehicles on the screen.
+     */
+    void removeVehicle(Vehicle v);
 }

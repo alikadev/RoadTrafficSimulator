@@ -17,4 +17,6 @@ public interface ICtrlWrk {
     void createAccount(Account account) throws DBException;
     boolean verifyAccount(Account account) throws DBException;
     Circuit getCircuit();
+    void startSimulation();
+    void stopSimulation();
 }

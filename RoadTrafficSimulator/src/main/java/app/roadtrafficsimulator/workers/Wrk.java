@@ -6,20 +6,19 @@ import app.roadtrafficsimulator.controllers.IWrkCtrl;
 import app.roadtrafficsimulator.exceptions.DBException;
 import app.roadtrafficsimulator.exceptions.UnexpectedException;
 import app.roadtrafficsimulator.helper.Physics;
-import javafx.beans.NamedArg;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.ImagePattern;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author kucie
  */
-public class Wrk implements ICtrlWrk {
+public class Wrk implements ICtrlWrk, ISimulationWrk {
     public Wrk() {
         carTextures = new ArrayList<>();
 
@@ -53,6 +52,7 @@ public class Wrk implements ICtrlWrk {
         ctrl = null;
         account = null;
         circuit = circuitStraightRoad();
+        simulator = new SimulationWrk(this);
     }
 
     public ImageView getRoadTexture() {
@@ -86,6 +86,10 @@ public class Wrk implements ICtrlWrk {
 
     public void start() throws DBException {
         db.start();
+        /// TMP ///
+        Vehicle v = new Car(getCarTexture(), (Car)circuit.getDefaultVehicle(), circuit.getRoads().get(0));
+        addVehicle(v);
+        /// END TMP ///
     }
 
     public void terminate() throws RuntimeException {
@@ -114,6 +118,32 @@ public class Wrk implements ICtrlWrk {
         return circuit;
     }
 
+    @Override
+    public void startSimulation() {
+        simulator.start(circuit);
+    }
+
+    @Override
+    public void stopSimulation() {
+        simulator.stop();
+    }
+
+    @Override
+    public void addVehicle(Vehicle v) {
+        // Add the vehicle to the list
+        List<Vehicle> a = circuit.getVehicles();
+        a.add(v);
+        circuit.setVehicles(a);
+
+        // Render the vehicle
+        ctrl.addVehicle(v);
+    }
+
+    @Override
+    public void removeVehicle(Vehicle v) {
+        ctrl.removeVehicle(v);
+    }
+
     public void setCtrl(IWrkCtrl ctrl) {
         this.ctrl = ctrl;
     }
@@ -124,4 +154,5 @@ public class Wrk implements ICtrlWrk {
     private Account account;
     private DBWrk db;
     private IWrkCtrl ctrl;
+    private SimulationWrk simulator;
 }
