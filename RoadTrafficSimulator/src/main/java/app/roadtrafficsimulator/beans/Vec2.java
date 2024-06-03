@@ -1,5 +1,8 @@
 package app.roadtrafficsimulator.beans;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+
 /**
  * Represents a vector in the 2D space.
  */
@@ -10,8 +13,8 @@ public class Vec2 {
      * @param y The Y coordinate.
      */
     public Vec2(double x, double y) {
-        this.x = x;
-        this.y = y;
+        this.x = new SimpleDoubleProperty(x);
+        this.y = new SimpleDoubleProperty(y);
     }
 
     /**
@@ -19,8 +22,8 @@ public class Vec2 {
      * @param v The value for X and Y.
      */
     public Vec2(double v) {
-        this.x = v;
-        this.y = v;
+        x = new SimpleDoubleProperty(v);
+        y = new SimpleDoubleProperty(v);
     }
 
     /**
@@ -35,8 +38,8 @@ public class Vec2 {
     @Override
     public String toString() {
         return "Vec2{" +
-                "x=" + x +
-                ", y=" + y +
+                "x=" + x.getValue() +
+                ", y=" + y.getValue() +
                 '}';
     }
 
@@ -46,7 +49,7 @@ public class Vec2 {
      * @return The resulting vector.
      */
     public Vec2 add(Vec2 a) {
-        return new Vec2(x + a.x, y + a.y);
+        return new Vec2(x.getValue() + a.x.getValue(), y.getValue() + a.y.getValue());
     }
 
     /**
@@ -55,7 +58,7 @@ public class Vec2 {
      * @return The resulting vector.
      */
     public Vec2 add(double a) {
-        return new Vec2(x + a, y + a);
+        return new Vec2(x.getValue() + a, y.getValue() + a);
     }
 
     /**
@@ -64,7 +67,7 @@ public class Vec2 {
      * @return The resulting vector.
      */
     public Vec2 sub(Vec2 a) {
-        return new Vec2(x - a.x, y - a.y);
+        return new Vec2(x.getValue() - a.x.getValue(), y.getValue() - a.y.getValue());
     }
 
     /**
@@ -73,7 +76,7 @@ public class Vec2 {
      * @return The resulting vector.
      */
     public Vec2 sub(double a) {
-        return new Vec2(x - a, y - a);
+        return new Vec2(x.getValue() - a, y.getValue() - a);
     }
 
     /**
@@ -82,7 +85,7 @@ public class Vec2 {
      * @return The resulting vector.
      */
     public Vec2 mul(double f) {
-        return new Vec2(x * f, y * f);
+        return new Vec2(x.getValue() * f, y.getValue() * f);
     }
 
     /**
@@ -90,7 +93,7 @@ public class Vec2 {
      * @return The length of the vector.
      */
     public double length() {
-        return Math.sqrt(x*x + y*y);
+        return Math.sqrt(x.getValue()*x.getValue() + y.getValue()*y.getValue());
     }
 
     /**
@@ -99,7 +102,7 @@ public class Vec2 {
      */
     public Vec2 normal() {
         double length = length();
-        return new Vec2(x/length, y/length);
+        return new Vec2(x.getValue()/length, y.getValue()/length);
     }
 
     /**
@@ -107,6 +110,14 @@ public class Vec2 {
      * @return The X coordinate.
      */
     public double getX() {
+        return x.getValue();
+    }
+
+    /**
+     * Get the X coordinate property.
+     * @return The X property.
+     */
+    public DoubleProperty getXProperty() {
         return x;
     }
 
@@ -115,7 +126,7 @@ public class Vec2 {
      * @param x The X coordinate.
      */
     public void setX(double x) {
-        this.x = x;
+        this.x.setValue(x);
     }
 
     /**
@@ -123,6 +134,14 @@ public class Vec2 {
      * @return The Y coordinate.
      */
     public double getY() {
+        return y.getValue();
+    }
+
+    /**
+     * Get the Y coordinate property.
+     * @return The Y property.
+     */
+    public DoubleProperty getYProperty() {
         return y;
     }
 
@@ -131,15 +150,15 @@ public class Vec2 {
      * @param y The Y coordinate.
      */
     public void setY(double y) {
-        this.y = y;
+        this.y.setValue(y);
     }
 
     /**
      * The X coordinate of the vector.
      */
-    private double x;
+    private SimpleDoubleProperty x;
     /**
      * The Y coordinate of the vector.
      */
-    private double y;
+    private SimpleDoubleProperty y;
 }

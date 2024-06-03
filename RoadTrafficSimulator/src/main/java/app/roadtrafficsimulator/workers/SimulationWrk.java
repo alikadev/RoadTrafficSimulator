@@ -11,7 +11,7 @@ public class SimulationWrk {
         circuit = null;
         this.wrk = wrk;
         running = false;
-        thr = new Thread(this::run);
+        thr = null;
     }
 
     public void start(Circuit circuit) {
@@ -20,6 +20,7 @@ public class SimulationWrk {
 
         this.circuit = circuit;
         running = true;
+        thr = new Thread(this::run);
         thr.start();
     }
 
@@ -27,6 +28,7 @@ public class SimulationWrk {
         try {
             running = false;
             thr.join();
+            thr = null;
         } catch (InterruptedException e) {
             throw new RuntimeException("Failed to stop the simulation: " + e.getMessage());
         }
@@ -37,7 +39,6 @@ public class SimulationWrk {
         while (running) {
             // Calculate deltatime (time change since the last time)
             long time = System.nanoTime();
-            System.out.println(time);
             double deltaTime = ((time - lastTime) / 1000000000.0);
             lastTime = time;
 
@@ -49,9 +50,7 @@ public class SimulationWrk {
             }
 
             for (Vehicle v : toDestroy) {
-                System.out.println("Destroying " + v + "'s ass");
-                stop();
-                //wrk.removeVehicle(v);
+                wrk.removeVehicle(v);
             }
         }
     }
@@ -64,7 +63,6 @@ public class SimulationWrk {
         double accelerationVelocity = v.getAcceleration() * dt;
         double decelerationVelocity = v.getDeceleration() * dt;
 
-        System.out.println(v.getPosition());
         try {
             Thread.sleep(10);
         } catch (InterruptedException e) {}

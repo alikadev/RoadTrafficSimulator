@@ -199,8 +199,10 @@ public class SimulationCtrl implements ICtrl {
     @Override
     public void removeVehicle(Vehicle v) {
         Platform.runLater(() -> {
-            Node vn = v.draw();
-            foreground.getChildren().remove(vn);
+            // TODO: Find a better way to directly remove this node without clearing all nodes.
+            foreground.getChildren().clear();
+            for (Vehicle vehicle : wrk.getCircuit().getVehicles())
+                foreground.getChildren().add(vehicle.draw());
         });
     }
 

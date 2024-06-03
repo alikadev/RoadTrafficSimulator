@@ -142,6 +142,7 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
     @Override
     public void removeVehicle(Vehicle v) {
         ctrl.removeVehicle(v);
+        circuit.getVehicles().remove(v);
     }
 
     public void setCtrl(IWrkCtrl ctrl) {
