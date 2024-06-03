@@ -21,17 +21,28 @@ import java.util.ArrayList;
  */
 public class Wrk implements ICtrlWrk {
     public Wrk() {
-        // Verify ressources URLs
-        URL dbConfigURL = getClass().getClassLoader().getResource(App.DB_CONFIG_LOCALHOST);
-        if (dbConfigURL == null)
-            throw new UnexpectedException("Ressource not found: " + App.DB_CONFIG_LOCALHOST);
-
-        URL roadTextureURL = getClass().getClassLoader().getResource(App.ROAD_TEXTURE);
-        if (roadTextureURL == null)
-            throw new UnexpectedException("Ressource not found: " + App.ROAD_TEXTURE);
+        carTextures = new ArrayList<>();
 
         // Load ressources
         try {
+            // Verify ressources URLs
+            URL dbConfigURL = getClass().getClassLoader().getResource(App.DB_CONFIG_LOCALHOST);
+            if (dbConfigURL == null)
+                throw new UnexpectedException("Ressource not found: " + App.DB_CONFIG_LOCALHOST);
+
+            URL roadTextureURL = getClass().getClassLoader().getResource(App.ROAD_TEXTURE);
+            if (roadTextureURL == null)
+                throw new UnexpectedException("Ressource not found: " + App.ROAD_TEXTURE);
+
+            // Verify and load all car textures
+            for (int i = App.CAR_TEXTURE_START; i < App.CAR_TEXTURE_END; ++i) {
+                URL carTextureURL = getClass().getClassLoader().getResource(App.CAR_TEXTURE_BASE + i + App.CAR_TEXTURE_EXTENSION);
+                if (carTextureURL == null)
+                    throw new UnexpectedException("Ressource not found: " + App.CAR_TEXTURE_BASE + " @" + i);
+                carTextures.add(new Image(carTextureURL.openStream()));
+            }
+
+            // Load resources
             db = new DBWrk(dbConfigURL.getPath());
             roadTexture = new Image(roadTextureURL.openStream());
         } catch (IOException e) {
@@ -46,6 +57,14 @@ public class Wrk implements ICtrlWrk {
 
     public ImageView getRoadTexture() {
         ImageView iv = new ImageView(roadTexture);
+        iv.setSmooth(false);
+        iv.setPreserveRatio(true);
+        return iv;
+    }
+
+    public ImageView getCarTexture() {
+        int randomId = (int)(Math.random() * carTextures.size());
+        ImageView iv = new ImageView(carTextures.get(randomId));
         iv.setSmooth(false);
         iv.setPreserveRatio(true);
         return iv;
@@ -101,6 +120,7 @@ public class Wrk implements ICtrlWrk {
 
     private Circuit circuit;
     private Image roadTexture;
+    private ArrayList<Image> carTextures;
     private Account account;
     private DBWrk db;
     private IWrkCtrl ctrl;

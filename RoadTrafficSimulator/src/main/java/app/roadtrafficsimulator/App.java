@@ -1,5 +1,6 @@
 package app.roadtrafficsimulator;
 
+import app.roadtrafficsimulator.beans.Account;
 import app.roadtrafficsimulator.controllers.ICtrl;
 import app.roadtrafficsimulator.controllers.LoginCtrl;
 import app.roadtrafficsimulator.exceptions.DBException;
@@ -27,6 +28,10 @@ public class App extends Application {
     private static final String TITLE = "Road Traffic Simulator";
     public static final String DB_CONFIG_LOCALHOST = "app/roadtrafficsimulator/config/db/localhost.properties";
     public static final String ROAD_TEXTURE = "app/roadtrafficsimulator/textures/road.png";
+    public static final int CAR_TEXTURE_START = 1;
+    public static final int CAR_TEXTURE_END = 6;
+    public static final String CAR_TEXTURE_BASE = "app/roadtrafficsimulator/textures/car";
+    public static final String CAR_TEXTURE_EXTENSION = ".png";
 
     public App() {
         super();
@@ -54,6 +59,7 @@ public class App extends Application {
 
         // Load the basic view
         loadView(SIMULATION_VIEW);
+
         // Start!
         try {
             wrk.start();

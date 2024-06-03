@@ -1,7 +1,18 @@
 package app.roadtrafficsimulator.beans;
 
+import app.roadtrafficsimulator.exceptions.UnexpectedException;
+import app.roadtrafficsimulator.helper.FX;
+import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.scene.transform.Scale;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Represents a car with various physical properties and implements the Vehicle interface.
@@ -12,7 +23,9 @@ import java.util.List;
 public class Car implements Vehicle {
 
     /**
-     * Constructs a Car with the specified physical properties.
+     * Constructs a Car with the specified physical properties. Should only be used to
+     * define the default car.
+     * An instance of this car will be able to be drawn because the texture is not set.
      *
      * @param reactionTime the reaction time of the car (in seconds)
      * @param decelerationSpeed the deceleration speed of the car (in meters per second squared)
@@ -33,6 +46,63 @@ public class Car implements Vehicle {
         props.add(this.breakingSpeed);
         props.add(this.acceleration);
         props.add(this.securityTime);
+    }
+
+    /**
+     * Create a car from the default car.
+     *
+     * @param iv The ImageView that will be used to draw the car
+     * @param car The car that will be deeply copied
+     * @param rd The current road
+     */
+    public Car(ImageView iv, Car car, Road rd) {
+        this.reactionTime = new InputField(car.reactionTime.getValueLabel(), car.reactionTime.getValue());
+        this.decelerationSpeed = new InputField(car.decelerationSpeed.getValueLabel(), car.decelerationSpeed.getValue());
+        this.breakingSpeed = new InputField(car.breakingSpeed.getValueLabel(), car.breakingSpeed.getValue());
+        this.acceleration = new InputField(car.acceleration.getValueLabel(), car.acceleration.getValue());
+        this.securityTime = new InputField(car.securityTime.getValueLabel(), car.securityTime.getValue());
+
+        props = new ArrayList<>();
+        props.add(this.reactionTime);
+        props.add(this.decelerationSpeed);
+        props.add(this.breakingSpeed);
+        props.add(this.acceleration);
+        props.add(this.securityTime);
+
+        this.imageBase = iv;
+
+        this.road = rd;
+        position = new Vec2(road.getStartPosition());
+    }
+
+    @Override
+    public Node draw() {
+        if (road == null)
+            throw new UnexpectedException("Miss use of the Car class. The car isn't on any road!");
+
+        // Manage rotation
+        imageBase.setRotate(road.getCarRotation(this) + 90);
+        Image texture = imageBase.snapshot(FX.set(new SnapshotParameters(), p -> p.setFill(Color.TRANSPARENT)), null);
+
+        // Render on canvas without downscale
+        Canvas c = new Canvas(texture.getWidth(), texture.getHeight());
+        c.getGraphicsContext2D().setImageSmoothing(false);
+        c.getGraphicsContext2D().drawImage(texture, 0, 0);
+
+        // Set position
+        Vec2 halfCarWidth = new Vec2(Roadable.WIDTH/2);
+        Vec2 pos = getPosition().sub(halfCarWidth);
+        c.setLayoutX(pos.getX());
+        c.setLayoutY(pos.getY());
+
+        // Downscale the canvas
+        double scale = texture.getWidth() / Roadable.WIDTH;
+        c.getTransforms().add(new Scale(1.0/scale, 1.0/scale));
+
+        // Disable parent management to not cause UI problems when overflowing
+        c.setManaged(false);
+
+        return c;
     }
 
     /**
@@ -121,6 +191,10 @@ public class Car implements Vehicle {
         return props;
     }
 
+    /**
+     * The base ImageView used to render the texture.
+     */
+    private ImageView imageBase;
     /**
      * The road the car is on.
      */

@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.roadtrafficsimulator.controllers.SimulationCtrl">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.roadtrafficsimulator.controllers.SimulationCtrl">
     <stylesheets>
         <URL value="@/app/roadtrafficsimulator/css/simulation.css" />
     </stylesheets>
@@ -18,8 +18,8 @@
          <children>
             <StackPane HBox.hgrow="ALWAYS">
                <children>
-                  <AnchorPane fx:id="foreground" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
                   <AnchorPane fx:id="background" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                  <AnchorPane fx:id="foreground" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
                   <AnchorPane>
                      <children>
                         <Button fx:id="simulationBtn" mnemonicParsing="false" onAction="#toggleSimulation" text="Démarrer la simulation" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">

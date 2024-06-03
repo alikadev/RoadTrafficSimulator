@@ -2,23 +2,13 @@ package app.roadtrafficsimulator.beans;
 
 import app.roadtrafficsimulator.exceptions.UnexpectedException;
 import app.roadtrafficsimulator.helper.FX;
-import javafx.beans.binding.DoubleBinding;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.scene.transform.Scale;
 import javafx.util.Pair;
 
@@ -36,7 +26,7 @@ public class Road implements Roadable {
     /**
      * Constructs a Road with the specified head position, direction, size, and traffic density.
      *
-     * @param iv The paint object used to draw the road
+     * @param iv The ImageView that will be used to draw the road
      * @param headPosition the head position of the road
      * @param direction the direction of the road traffic
      * @param size the size of the road (in meters)
@@ -72,8 +62,6 @@ public class Road implements Roadable {
 
         double iw = texture.getWidth();
         double ih = texture.getHeight();
-        System.out.println("Image: " + iw + " " + ih);
-        System.out.println("Canvas: " + canvas.getWidth() + " " +  canvas.getHeight());
 
         for (double x = 0; x < canvas.getWidth(); x += iw) {
             for (double y = 0; y < canvas.getHeight(); y += ih) {
@@ -99,9 +87,9 @@ public class Road implements Roadable {
 
         // Calculate positon and size
         Vec2 halfRoadWidth = new Vec2(Roadable.WIDTH/2);
-        Vec2 pos = getPosition().sub(halfRoadWidth);
+        Vec2 pos = getStartPosition().sub(halfRoadWidth);
         // Upscale the size to be able to draw all the pixels
-        Vec2 size = getEndPosition().sub(getPosition()).add(new Vec2(Roadable.WIDTH)).mul(scale);
+        Vec2 size = getEndPosition().sub(getStartPosition()).add(new Vec2(Roadable.WIDTH)).mul(scale);
 
         // Create the canvas
         canvas = new Canvas();
@@ -116,6 +104,18 @@ public class Road implements Roadable {
         canvas.setManaged(false);
 
         return canvas;
+    }
+
+    @Override
+    public double getCarRotation(Vehicle c) {
+        switch (direction) {
+            case TOP: return 0;
+            case DOWN: return 180;
+            case RIGHT: return 90;
+            case LEFT: return 270;
+        }
+
+        throw new UnexpectedException("Not all direction are managed up here!");
     }
 
     /**
@@ -175,7 +175,8 @@ public class Road implements Roadable {
      *
      * @return the head position of the road
      */
-    public Vec2 getPosition() {
+    @Override
+    public Vec2 getStartPosition() {
         return headPosition;
     }
 

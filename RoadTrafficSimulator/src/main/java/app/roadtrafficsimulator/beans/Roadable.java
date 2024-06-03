@@ -39,6 +39,22 @@ public interface Roadable {
     Node draw();
 
     /**
+     * Return the road starting position
+     *
+     * @return The road starting vector / coordinates
+     */
+    Vec2 getStartPosition();
+
+    /**
+     * Get the car rotation. This calculation is done with the whole vehicle
+     * in argument to increase animation details one day...
+     *
+     * @param c The car
+     * @return The angle in degrees
+     */
+    double getCarRotation(Vehicle c);
+
+    /**
      * Standard size of a road in Switzerland
      *
      * See the <a href="https://ge.ch/grandconseil/data/texte/PL12730A.pdf">source</a> here

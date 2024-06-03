@@ -4,6 +4,7 @@ import app.roadtrafficsimulator.App;
 import app.roadtrafficsimulator.beans.Circuit;
 import app.roadtrafficsimulator.beans.Roadable;
 import app.roadtrafficsimulator.beans.Vec2;
+import app.roadtrafficsimulator.beans.Vehicle;
 import app.roadtrafficsimulator.exceptions.NotImplementedYet;
 import app.roadtrafficsimulator.helper.EasyPopup;
 import app.roadtrafficsimulator.helper.FX;
@@ -109,6 +110,8 @@ public class SimulationCtrl implements ICtrl {
         background.setScaleX(ppm);
         background.setScaleY(ppm);
 
+        foreground.setScaleX(ppm);
+        foreground.setScaleY(ppm);
     }
 
     /**
@@ -157,22 +160,48 @@ public class SimulationCtrl implements ICtrl {
     public void start() {
         editMenu.getTabs().add(settingsTab);
         editMenu.getTabs().add(generalTab);
-        Circuit c = wrk.getCircuit();
-
-        // Transformation to center
-        Vec2 transform = new Vec2(background.getWidth() / 2, background.getHeight() / 2);
 
         // Draw roads
-        for (Roadable rd : c.getRoads()) {
-            Node s = rd.draw();
-            s.setOnMouseClicked(this::editRoad);
-            s.translateXProperty().bind(background.widthProperty().divide(2.f));
-            s.translateYProperty().bind(background.heightProperty().divide(2.f));
-            background.getChildren().add(s);
-        }
+        render();
 
         // First update of the pixel per meter
         updatePixelPerMeter(null);
+    }
+
+    @Override
+    public void render() {
+        renderRoads();
+        renderVehicles();
+    }
+
+    /**
+     * Render the roads of the circuit.
+     */
+    public void renderRoads() {
+        Circuit c = wrk.getCircuit();
+        background.getChildren().clear();
+        for (Roadable rd : c.getRoads()) {
+            Node node = rd.draw();
+            node.setOnMouseClicked(this::editRoad);
+            node.translateXProperty().bind(background.widthProperty().divide(2.f));
+            node.translateYProperty().bind(background.heightProperty().divide(2.f));
+            background.getChildren().add(node);
+        }
+    }
+
+    /**
+     * render the vehicles of the circuit.
+     */
+    public void renderVehicles() {
+        Circuit c = wrk.getCircuit();
+        foreground.getChildren().clear();
+        for (Vehicle v : c.getVehicles()) {
+            Node node = v.draw();
+            node.setOnMouseClicked(this::editRoad);
+            node.translateXProperty().bind(foreground.widthProperty().divide(2.f));
+            node.translateYProperty().bind(foreground.heightProperty().divide(2.f));
+            foreground.getChildren().add(node);
+        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 package app.roadtrafficsimulator.beans;
 
+import javafx.scene.Node;
+
 import java.util.List;
 
 /**
@@ -12,4 +14,11 @@ public interface Vehicle {
      * @return the list of all properties of the car
      */
     List<InputField> getProperties();
+
+    /**
+     * Returns the resulting drawable element
+     *
+     * @return The end position
+     */
+    Node draw();
 }

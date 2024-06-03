@@ -23,6 +23,15 @@ public class Vec2 {
         this.y = v;
     }
 
+    /**
+     * Copy constructor.
+     * @param v The value for X and Y.
+     */
+    public Vec2(Vec2 v) {
+        this.x = v.x;
+        this.y = v.y;
+    }
+
     @Override
     public String toString() {
         return "Vec2{" +

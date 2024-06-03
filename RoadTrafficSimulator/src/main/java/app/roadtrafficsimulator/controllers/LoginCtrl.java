@@ -4,6 +4,7 @@ import app.roadtrafficsimulator.App;
 import app.roadtrafficsimulator.beans.Account;
 import app.roadtrafficsimulator.exceptions.DBException;
 import app.roadtrafficsimulator.exceptions.LoginException;
+import app.roadtrafficsimulator.exceptions.UnexpectedException;
 import app.roadtrafficsimulator.helper.EasyPopup;
 import app.roadtrafficsimulator.workers.ICtrlWrk;
 import javafx.application.Platform;
@@ -106,6 +107,11 @@ public class LoginCtrl implements ICtrl {
         } catch (DBException e) {
             EasyPopup.displayError("Erreur", "Erreur durant la création du compte.", e.getMessage(), true);
         }
+    }
+
+    @Override
+    public void render() {
+        throw new UnexpectedException("Nothing to render on the login view...");
     }
 
     private void nextView() {
