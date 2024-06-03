@@ -1,6 +1,25 @@
 package app.roadtrafficsimulator.beans;
 
 import app.roadtrafficsimulator.exceptions.UnexpectedException;
+import app.roadtrafficsimulator.helper.FX;
+import javafx.beans.binding.DoubleBinding;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
+import javafx.scene.transform.Scale;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -14,68 +33,53 @@ import java.util.Map;
  * @autor Elvin Kuci
  */
 public class Road implements Roadable {
-
-    /**
-     * Constructs a Road with the specified head position, direction, and size.
-     *
-     * @param backPosition the head position of the road
-     * @param direction the direction of the road traffic
-     * @param size the size of the road (in meters)
-     */
-    public Road(Vec2 backPosition, Direction direction, double size) {
-        this.speedLimit = new InputField("Vitesse (km/h)", 0, "+-", 0);
-        this.size = new InputField("Size (m)", size);
-        this.traffic = new InputField("Densitée (véhicule/m)", 0);
-        this.backPosition = backPosition;
-        this.direction = direction;
-
-        props = new ArrayList<>();
-        props.add(this.speedLimit);
-        props.add(this.size);
-        props.add(this.traffic);
-    }
-
     /**
      * Constructs a Road with the specified head position, direction, size, and traffic density.
      *
-     * @param backPosition the head position of the road
+     * @param iv The paint object used to draw the road
+     * @param headPosition the head position of the road
      * @param direction the direction of the road traffic
      * @param size the size of the road (in meters)
      * @param speedLimit the speed limit of the road (in kilometers per hour)
      */
-    public Road(Vec2 backPosition, Direction direction, double size, double speedLimit) {
+    public Road(ImageView iv, Vec2 headPosition, Direction direction, double size, double speedLimit) {
         this.speedLimit = new InputField("Vitesse (km/h)", speedLimit, "+-", 0);
         this.size = new InputField("Size (m)", size);
         this.traffic = new InputField("Densitée (véhicule/m)", 0);
-        this.backPosition = backPosition;
+        this.headPosition = headPosition;
         this.direction = direction;
 
         props = new ArrayList<>();
         props.add(this.speedLimit);
         props.add(this.size);
         props.add(this.traffic);
+
+        switch (direction) {
+            case RIGHT:
+            case LEFT:
+                iv.setRotate(90);
+        }
+
+        this.texture = iv.snapshot(FX.set(new SnapshotParameters(), p -> p.setFill(Color.TRANSPARENT)), null);
     }
 
     /**
-     * Constructs a Road with the specified head position, direction, size, traffic density, and speed limit.
-     *
-     * @param backPosition the head position of the road
-     * @param direction the direction of the road traffic
-     * @param size the size of the road (in meters)
-     * @param traffic the traffic density of the road (vehicles per meter)
-     * @param speedLimit the speed limit of the road (in kilometers per hour)
+     * Draw the texture on the canvas to fill it
      */
-    public Road(Vec2 backPosition, Direction direction, double size, double speedLimit, double traffic) {
-        this.speedLimit = new InputField("Vitesse (km/h)", speedLimit, "+-", 0);
-        this.size = new InputField("Size (m)", size);
-        this.traffic = new InputField("Densitée (véhicule/m)", traffic);
-        this.backPosition = backPosition;
-        this.direction = direction;
+    private void drawRepeatedImage() {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
 
-        props = new ArrayList<>();
-        props.add(this.speedLimit);
-        props.add(this.size);
-        props.add(this.traffic);
+        double iw = texture.getWidth();
+        double ih = texture.getHeight();
+        System.out.println("Image: " + iw + " " + ih);
+        System.out.println("Canvas: " + canvas.getWidth() + " " +  canvas.getHeight());
+
+        for (double x = 0; x < canvas.getWidth(); x += iw) {
+            for (double y = 0; y < canvas.getHeight(); y += ih) {
+                gc.drawImage(texture, x, y);
+            }
+        }
     }
 
     @Override
@@ -88,10 +92,44 @@ public class Road implements Roadable {
         return props;
     }
 
+    @Override
+    public Node draw() {
+        // Scale between the road and the texture
+        double scale = texture.getWidth() / Roadable.WIDTH;
+
+        // Calculate positon and size
+        Vec2 halfRoadWidth = new Vec2(Roadable.WIDTH/2);
+        Vec2 pos = getPosition().sub(halfRoadWidth);
+        // Upscale the size to be able to draw all the pixels
+        Vec2 size = getEndPosition().sub(getPosition()).add(new Vec2(Roadable.WIDTH)).mul(scale);
+
+        // Create the canvas
+        canvas = new Canvas();
+        canvas.setWidth(size.getX());
+        canvas.setHeight(size.getY());
+        canvas.setLayoutX(pos.getX());
+        canvas.setLayoutY(pos.getY());
+        drawRepeatedImage();
+        // Downscale the texture to its original value
+        canvas.getTransforms().add(new Scale(1.0/scale,1.0/scale));
+        // Disable parent management to not cause UI problems when overflowing
+        canvas.setManaged(false);
+
+        return canvas;
+    }
+
+    /**
+     * Get the next road.
+     * @return The next road.
+     */
     public Roadable getNext() {
         return next;
     }
 
+    /**
+     * Set the next road.
+     * @param next The next road.
+     */
     public void setNext(Roadable next) {
         this.next = next;
     }
@@ -138,7 +176,7 @@ public class Road implements Roadable {
      * @return the head position of the road
      */
     public Vec2 getPosition() {
-        return backPosition;
+        return headPosition;
     }
 
     /**
@@ -148,13 +186,24 @@ public class Road implements Roadable {
      */
     public Vec2 getEndPosition() {
         switch (direction) {
-            case TOP: return new Vec2(backPosition.getX(), backPosition.getY() - size.getValue());
-            case DOWN: return new Vec2(backPosition.getX(), backPosition.getY() + size.getValue());
-            case LEFT: return new Vec2(backPosition.getX() - size.getValue(), backPosition.getY());
-            case RIGHT: return new Vec2(backPosition.getX() + size.getValue(), backPosition.getY());
+            case TOP: return new Vec2(headPosition.getX(), headPosition.getY() - size.getValue());
+            case DOWN: return new Vec2(headPosition.getX(), headPosition.getY() + size.getValue());
+            case LEFT: return new Vec2(headPosition.getX() - size.getValue(), headPosition.getY());
+            case RIGHT: return new Vec2(headPosition.getX() + size.getValue(), headPosition.getY());
         }
         throw new UnexpectedException("Unexpected direction value");
     }
+
+    /**
+     * The rendered rectangle
+     */
+    Canvas canvas;
+
+    /**
+     * The image to render on the road.
+     * It should be already transformed (rotated, ...) before the `draw` call.
+     */
+    Image texture;
 
     /**
      * The speed limit input field of the road.
@@ -179,7 +228,7 @@ public class Road implements Roadable {
     /**
      * The head position of the road.
      */
-    private Vec2 backPosition;
+    private Vec2 headPosition;
 
     /**
      * The properties of the road.

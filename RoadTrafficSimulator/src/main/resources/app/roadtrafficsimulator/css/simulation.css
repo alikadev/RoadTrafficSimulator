@@ -1,5 +1,5 @@
-.yellow {
-    -fx-background-color: yellow;
+#background {
+    -fx-background-color: #171717;
 }
 
 Button {

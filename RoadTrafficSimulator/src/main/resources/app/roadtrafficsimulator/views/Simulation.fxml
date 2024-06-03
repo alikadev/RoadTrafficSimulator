@@ -6,30 +6,36 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.roadtrafficsimulator.controllers.SimulationCtrl">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.roadtrafficsimulator.controllers.SimulationCtrl">
     <stylesheets>
         <URL value="@/app/roadtrafficsimulator/css/simulation.css" />
     </stylesheets>
    <center>
-      <StackPane BorderPane.alignment="CENTER">
+      <HBox>
          <children>
-            <AnchorPane fx:id="foreground" />
-            <AnchorPane fx:id="background" />
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+            <StackPane HBox.hgrow="ALWAYS">
                <children>
-                  <Button fx:id="simulationBtn" mnemonicParsing="false" onAction="#toggleSimulation" text="Démarrer la simulation" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
-                     <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                     </padding>
-                  </Button>
+                  <AnchorPane fx:id="foreground" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                  <AnchorPane fx:id="background" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                  <AnchorPane>
+                     <children>
+                        <Button fx:id="simulationBtn" mnemonicParsing="false" onAction="#toggleSimulation" text="Démarrer la simulation" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </Button>
+                     </children>
+                  </AnchorPane>
                </children>
-            </AnchorPane>
+            </StackPane>
+            <TabPane fx:id="editMenu" maxWidth="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="SOMETIMES">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></TabPane>
          </children>
-      </StackPane>
+      </HBox>
    </center>
-   <right>
-      <TabPane fx:id="editMenu" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-   </right>
 </BorderPane>

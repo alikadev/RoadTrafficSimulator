@@ -1,10 +1,17 @@
 package app.roadtrafficsimulator.workers;
 
+import app.roadtrafficsimulator.App;
 import app.roadtrafficsimulator.beans.*;
 import app.roadtrafficsimulator.controllers.IWrkCtrl;
 import app.roadtrafficsimulator.exceptions.DBException;
+import app.roadtrafficsimulator.exceptions.UnexpectedException;
 import app.roadtrafficsimulator.helper.Physics;
+import javafx.beans.NamedArg;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.paint.ImagePattern;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -13,19 +20,42 @@ import java.util.ArrayList;
  * @author kucie
  */
 public class Wrk implements ICtrlWrk {
-    public Wrk(URL dbConfig) {
-        ctrl = null;
-        db = new DBWrk(dbConfig.getPath());
-        account = null;
+    public Wrk() {
+        // Verify ressources URLs
+        URL dbConfigURL = getClass().getClassLoader().getResource(App.DB_CONFIG_LOCALHOST);
+        if (dbConfigURL == null)
+            throw new UnexpectedException("Ressource not found: " + App.DB_CONFIG_LOCALHOST);
 
+        URL roadTextureURL = getClass().getClassLoader().getResource(App.ROAD_TEXTURE);
+        if (roadTextureURL == null)
+            throw new UnexpectedException("Ressource not found: " + App.ROAD_TEXTURE);
+
+        // Load ressources
+        try {
+            db = new DBWrk(dbConfigURL.getPath());
+            roadTexture = new Image(roadTextureURL.openStream());
+        } catch (IOException e) {
+            throw new UnexpectedException("Fail to load ressource: " + e.getMessage());
+        }
+
+        // Continue
+        ctrl = null;
+        account = null;
         circuit = circuitStraightRoad();
+    }
+
+    public ImageView getRoadTexture() {
+        ImageView iv = new ImageView(roadTexture);
+        iv.setSmooth(false);
+        iv.setPreserveRatio(true);
+        return iv;
     }
 
     private Circuit circuitStraightRoad() {
         Circuit circuit = new Circuit();
         ArrayList<Roadable> rds = new ArrayList<>();
-        Road rd1 = new Road(new Vec2(20,20), Direction.RIGHT, 30, 70 * Physics.KM_H);
-        Road rd2 = new Road(new Vec2(50,20), Direction.RIGHT, 40, 50 * Physics.KM_H);
+        Road rd1 = new Road(getRoadTexture(), new Vec2(-30,0), Direction.RIGHT, 30, 70 * Physics.KM_H);
+        Road rd2 = new Road(getRoadTexture(), new Vec2(0,0), Direction.RIGHT, 40, 50 * Physics.KM_H);
         rd1.setNext(rd2);
         rds.add(rd1);
         rds.add(rd2);
@@ -69,7 +99,8 @@ public class Wrk implements ICtrlWrk {
         this.ctrl = ctrl;
     }
 
-    Circuit circuit;
+    private Circuit circuit;
+    private Image roadTexture;
     private Account account;
     private DBWrk db;
     private IWrkCtrl ctrl;

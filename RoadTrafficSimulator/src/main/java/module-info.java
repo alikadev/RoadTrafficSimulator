@@ -10,6 +10,6 @@ module app.roadtrafficsimulator {
     opens app.roadtrafficsimulator.controllers;
     opens app.roadtrafficsimulator.views;
     opens app.roadtrafficsimulator.css;
-    
-    
+    opens app.roadtrafficsimulator.textures;
+    opens app.roadtrafficsimulator.config.db;
 }

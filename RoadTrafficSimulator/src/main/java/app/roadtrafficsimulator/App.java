@@ -9,6 +9,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
 import javafx.stage.Stage;
 
 import javax.security.auth.login.LoginException;
@@ -20,21 +22,18 @@ import java.net.URL;
  */
 public class App extends Application {
 
-    private static final String DB_CONFIG_LOCALHOST = "config/db/localhost.properties";
     public static final String LOGIN_VIEW = "views/Login.fxml";
     public static final String SIMULATION_VIEW = "views/Simulation.fxml";
     private static final String TITLE = "Road Traffic Simulator";
+    public static final String DB_CONFIG_LOCALHOST = "app/roadtrafficsimulator/config/db/localhost.properties";
+    public static final String ROAD_TEXTURE = "app/roadtrafficsimulator/textures/road.png";
 
     public App() {
         super();
 
-        // Prepare resources file real path
-        URL dbConfig = getClass().getResource(DB_CONFIG_LOCALHOST);
-        if (dbConfig == null) throw new RuntimeException("Le fichier de configuration de la base de donnée n'a pas été trouvé!");
-
         // Init local vars
         ctrl = null;
-        wrk = new Wrk(dbConfig); // Prefabricate the worker now, it will not change during runtime
+        wrk = new Wrk(); // Prefabricate the worker now, it will not change during runtime
         view = null;
         scene = null;
     }

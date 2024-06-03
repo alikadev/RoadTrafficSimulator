@@ -3,24 +3,43 @@ package app.roadtrafficsimulator.controllers;
 import app.roadtrafficsimulator.App;
 import app.roadtrafficsimulator.beans.Circuit;
 import app.roadtrafficsimulator.beans.Roadable;
+import app.roadtrafficsimulator.beans.Vec2;
+import app.roadtrafficsimulator.exceptions.NotImplementedYet;
+import app.roadtrafficsimulator.helper.EasyPopup;
 import app.roadtrafficsimulator.helper.FX;
+import app.roadtrafficsimulator.helper.Physics;
 import app.roadtrafficsimulator.workers.ICtrlWrk;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Transform;
+import javafx.scene.transform.Translate;
+import javafx.util.StringConverter;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 
 /**
  * This is the controller that will manage the edition and visualisation of the simulation.
@@ -34,9 +53,9 @@ public class SimulationCtrl implements ICtrl {
         app = null;
 
 
-        settingsField = new TextField();
-        pixelPerMeter = new TextField();
-        speedFactor = new TextField();
+        settingsField = new TextField("1");
+        pixelPerMeter = FX.set(new TextField("6"), (node) -> node.setOnAction(this::updatePixelPerMeter));
+        speedFactor = new TextField("1");
 
         settingsTab = new Tab("Réglages",
                 FX.set(new VBox(10,
@@ -63,19 +82,65 @@ public class SimulationCtrl implements ICtrl {
     @FXML
     public void toggleSimulation(ActionEvent ev) {
         editMenu.setVisible(!editMenu.isVisible());
-        if (editMenu.isVisible())
+        if (editMenu.isVisible()) {
             simulationBtn.setText("Démarrer la simulation");
-        else
+            editMenu.setPrefWidth(200);
+        }
+        else {
             simulationBtn.setText("Arrêter la simulation");
+            editMenu.setPrefWidth(0);
+        }
     }
 
+    /**
+     * Update the pixel per meter render.
+     * @param ev The event, ignored.
+     */
+    private void updatePixelPerMeter(ActionEvent ev) {
+        double ppm;
+        try {
+            ppm = Double.parseDouble(pixelPerMeter.getText());
+        } catch (NumberFormatException e) {
+            EasyPopup.displayError("Erreur de format", "Un nombre était attendu", "Le format du champ est invalide!", true);
+            pixelPerMeter.setText("1");
+            ppm = 1;
+        }
+
+        background.setScaleX(ppm);
+        background.setScaleY(ppm);
+
+    }
+
+    /**
+     * Load settings from the database.
+     * @param ev The event, ignored.
+     */
     private void loadSettings(MouseEvent ev) {
+        throw new NotImplementedYet("loadSettings");
     }
 
+    /**
+     * Save settings to the database.
+     * @param ev The event, ignored.
+     */
     private void saveSettings(MouseEvent ev) {
+        throw new NotImplementedYet("saveSettings");
     }
 
+    /**
+     * When you click on a road, this will be triggerd
+     * @param ev The event, ignored.
+     */
+    private void editRoad(MouseEvent ev) {
+        throw new NotImplementedYet("saveSettings");
+    }
+
+    /**
+     * Create new settings group in the database.
+     * @param ev The event, ignored.
+     */
     private void createSettings(MouseEvent ev) {
+        throw new NotImplementedYet("createSettings");
     }
 
     @Override
@@ -93,9 +158,21 @@ public class SimulationCtrl implements ICtrl {
         editMenu.getTabs().add(settingsTab);
         editMenu.getTabs().add(generalTab);
         Circuit c = wrk.getCircuit();
+
+        // Transformation to center
+        Vec2 transform = new Vec2(background.getWidth() / 2, background.getHeight() / 2);
+
+        // Draw roads
         for (Roadable rd : c.getRoads()) {
-            throw new RuntimeException("Not implemented yet");
+            Node s = rd.draw();
+            s.setOnMouseClicked(this::editRoad);
+            s.translateXProperty().bind(background.widthProperty().divide(2.f));
+            s.translateYProperty().bind(background.heightProperty().divide(2.f));
+            background.getChildren().add(s);
         }
+
+        // First update of the pixel per meter
+        updatePixelPerMeter(null);
     }
 
     @Override
@@ -137,9 +214,28 @@ public class SimulationCtrl implements ICtrl {
     @FXML
     private Button simulationBtn;
 
+    /**
+     * The settings tab.
+     */
     private Tab settingsTab;
+
+    /**
+     * The general data about the simulation tab.
+     */
     private Tab generalTab;
+
+    /**
+     * The settings text field.
+     */
     private TextField settingsField;
+
+    /**
+     * The `Pixel per Meter` text field.
+     */
     private TextField pixelPerMeter;
+
+    /**
+     * The `Speed Factor`.
+     */
     private TextField speedFactor;
 }

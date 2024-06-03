@@ -23,22 +23,65 @@ public class Vec2 {
         this.y = v;
     }
 
+    @Override
+    public String toString() {
+        return "Vec2{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
+
     /**
-     * Add 2 vectors.
+     * Add 2 vectors. (a, b) + (x, y) = (a + x, b + y)
      * @param a The other vector.
      * @return The resulting vector.
      */
     public Vec2 add(Vec2 a) {
-        return new Vec2(a.x + x, a.y + y);
+        return new Vec2(x + a.x, y + a.y);
     }
 
     /**
-     * Subtract 2 vectors.
+     * Add a value. (a, b) + x = (a + x, b + x)
+     * @param f The other vector.
+     * @return The resulting vector.
+     */
+    public Vec2 add(double a) {
+        return new Vec2(x + a, y + a);
+    }
+
+    /**
+     * Subtract 2 vectors. (a, b) - (x, y) = (a - x, b - y)
      * @param a The other vector.
      * @return The resulting vector.
      */
     public Vec2 sub(Vec2 a) {
-        return new Vec2(a.x - x, a.y - y);
+        return new Vec2(x - a.x, y - a.y);
+    }
+
+    /**
+     * Subtract 2 vectors. (a, b) - (x, y) = (a - x, b - y)
+     * @param a The other vector.
+     * @return The resulting vector.
+     */
+    public Vec2 sub(double a) {
+        return new Vec2(x - a, y - a);
+    }
+
+    /**
+     * Multiply by a factor.  (a, b) * x = (ax, bx)
+     * @param f The factor.
+     * @return The resulting vector.
+     */
+    public Vec2 mul(double f) {
+        return new Vec2(x * f, y * f);
+    }
+
+    /**
+     * Get the length of the vector.
+     * @return The length of the vector.
+     */
+    public double length() {
+        return Math.sqrt(x*x + y*y);
     }
 
     /**

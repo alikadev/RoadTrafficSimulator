@@ -1,5 +1,9 @@
 package app.roadtrafficsimulator.beans;
 
+import app.roadtrafficsimulator.helper.Physics;
+import javafx.scene.Node;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.util.Pair;
 
 import java.util.List;
@@ -26,4 +30,18 @@ public interface Roadable {
      * @return the properties of the road
      */
     List<InputField> getProperties();
+
+    /**
+     * Returns the resulting drawable element
+     *
+     * @return The end position
+     */
+    Node draw();
+
+    /**
+     * Standard size of a road in Switzerland
+     *
+     * See the <a href="https://ge.ch/grandconseil/data/texte/PL12730A.pdf">source</a> here
+     */
+    static double WIDTH = (6.4 * Physics.METER) / 2;
 }
