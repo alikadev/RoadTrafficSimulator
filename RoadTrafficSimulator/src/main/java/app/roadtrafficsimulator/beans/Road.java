@@ -2,6 +2,7 @@ package app.roadtrafficsimulator.beans;
 
 import app.roadtrafficsimulator.exceptions.UnexpectedException;
 import app.roadtrafficsimulator.helper.FX;
+import app.roadtrafficsimulator.helper.Physics;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
@@ -187,10 +188,10 @@ public class Road implements Roadable {
     /**
      * Returns the speed limit input field of the road.
      *
-     * @return the speed limit input field of the road
+     * @return the speed limit in meter per second (m/s)
      */
     public double getSpeedLimit() {
-        return speedLimit.getValue();
+        return speedLimit.getValue() * Physics.KM_H;
     }
 
     /**
@@ -262,7 +263,7 @@ public class Road implements Roadable {
     Image texture;
 
     /**
-     * The speed limit input field of the road.
+     * The speed limit input field of the road. (Value is in km/h)
      */
     private InputField speedLimit;
 

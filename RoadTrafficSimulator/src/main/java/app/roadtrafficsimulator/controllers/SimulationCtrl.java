@@ -11,6 +11,8 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -181,6 +183,45 @@ public class SimulationCtrl implements ICtrl {
     }
 
     /**
+     * Open the edit menu for a road.
+     *
+     * @param rd The road
+     */
+    private void openRoadEditMenu(Roadable rd) {
+        // Close last road tab if it exists
+        editMenu.getTabs().remove(roadTab);
+
+        // Fill the road settings
+        VBox roadSettings = new VBox();
+        for (InputField in : rd.getProperties()) {
+            roadSettings.getChildren().add(
+                    new VBox(
+                            new Label(in.getValueLabel()),
+                            FX.set(new TextField(), t -> t.textProperty().bindBidirectional(in.valueProperty()))
+                    )
+            );
+        }
+
+        // Create the tab
+        roadTab = new Tab("Route",
+                FX.set(new VBox(10,
+                        roadSettings
+                ), node -> { VBox.setVgrow(node, Priority.ALWAYS); node.getStyleClass().add("tab_content"); }));
+
+        // TODO: Implement and add traffic lights tab
+
+        // Open the tab
+        editMenu.getTabs().add(roadTab);
+        editMenu.getSelectionModel().select(roadTab);
+        editMenu.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
+            if (newTab != roadTab) {
+                editMenu.getTabs().remove(roadTab);
+            }
+        });
+
+    }
+
+    /**
      * Render the roads of the circuit.
      */
     public void renderRoads() {
@@ -188,7 +229,7 @@ public class SimulationCtrl implements ICtrl {
         background.getChildren().clear();
         for (Roadable rd : c.getRoads()) {
             Node node = rd.draw();
-            node.setOnMouseClicked(this::editRoad);
+            node.setOnMouseClicked(e -> openRoadEditMenu(rd));
             node.translateXProperty().bind(background.widthProperty().divide(2.f));
             node.translateYProperty().bind(background.heightProperty().divide(2.f));
             background.getChildren().add(node);
@@ -281,25 +322,30 @@ public class SimulationCtrl implements ICtrl {
     /**
      * The settings tab.
      */
-    private Tab settingsTab;
+    private final Tab settingsTab;
 
     /**
      * The general data about the simulation tab.
      */
-    private Tab generalTab;
+    private final Tab generalTab;
+
+    /**
+     * This is the tab that contains a road settings.
+     */
+    private Tab roadTab;
 
     /**
      * The settings text field.
      */
-    private TextField settingsField;
+    private final TextField settingsField;
 
     /**
      * The `Pixel per Meter` text field.
      */
-    private TextField pixelPerMeter;
+    private final TextField pixelPerMeter;
 
     /**
      * The `Speed Factor`.
      */
-    private TextField speedFactor;
+    private final TextField speedFactor;
 }
