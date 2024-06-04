@@ -15,7 +15,7 @@ public class Circuit {
      * Constructs a Circuit with a default vehicle and empty lists of roads and vehicles.
      */
     public Circuit() {
-        defaultVehicle = new Car(0.2, -3.5, -7.3, 5.5, 2);
+        defaultVehicle = new Car(0.2, -4.5, -7.3, 5.5, 2);
         roads = new ArrayList<>();
         vehicles = new ArrayList<>();
     }

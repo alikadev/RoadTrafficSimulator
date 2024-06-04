@@ -13,4 +13,6 @@ public interface IWrkCtrl {
      * Destroy a vehicles on the screen.
      */
     void removeVehicle(Vehicle v);
+
+    double getSpeedFactor();
 }

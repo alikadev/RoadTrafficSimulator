@@ -44,6 +44,8 @@ public class Road implements Roadable {
         props.add(this.size);
         props.add(this.traffic);
 
+        timer = 0;
+
         switch (direction) {
             case RIGHT:
             case LEFT:
@@ -56,18 +58,24 @@ public class Road implements Roadable {
     /**
      * Draw the texture on the canvas to fill it
      */
-    private void drawRepeatedImage() {
+    private void drawCanvasContent() {
+        // Get context
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0,0, canvas.getWidth(), canvas.getHeight());
 
         double iw = texture.getWidth();
         double ih = texture.getHeight();
 
+        // Draw road texture repeatedly
         for (double x = 0; x < canvas.getWidth(); x += iw) {
             for (double y = 0; y < canvas.getHeight(); y += ih) {
                 gc.drawImage(texture, x, y);
             }
         }
+
+        // Draw outer stroke
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(0,0,canvas.getWidth()-1, canvas.getHeight()-1);
     }
 
     @Override
@@ -97,7 +105,7 @@ public class Road implements Roadable {
         canvas.setHeight(size.getY());
         canvas.setLayoutX(pos.getX());
         canvas.setLayoutY(pos.getY());
-        drawRepeatedImage();
+        drawCanvasContent();
         // Downscale the texture to its original value
         canvas.getTransforms().add(new Scale(1.0/scale,1.0/scale));
         // Disable parent management to not cause UI problems when overflowing
@@ -139,6 +147,25 @@ public class Road implements Roadable {
         // Calculate new position
         v.move(endVector.normal().mul(distance));
         return true;
+    }
+
+    @Override
+    public boolean shouldSpawnVehicle(double dt) {
+        // Vehicle per minutes (v/m)
+        double vpm = traffic.getValue();
+        if (vpm == 0) return false;
+        // Vehicle per seconds (v/s)
+        double vps = vpm / 60;
+        // Second per vehicle (s/v)
+        double spv = 1 / vps;
+
+        timer += dt;
+        if (timer >= spv) {
+            timer -= spv;
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -218,6 +245,11 @@ public class Road implements Roadable {
         throw new UnexpectedException("Unexpected direction value");
     }
 
+    @Override
+    public void setTraffic(double traffic) {
+        this.traffic.valueProperty().setValue(Double.toString(traffic));
+    }
+
     /**
      * The rendered rectangle
      */
@@ -258,8 +290,14 @@ public class Road implements Roadable {
      * The properties of the road.
      */
     private List<InputField> props;
+
     /**
      * The next road.
      */
     private Roadable next;
+
+    /**
+     * This is a timer/counter.
+     */
+    private double timer;
 }

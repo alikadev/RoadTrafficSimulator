@@ -46,6 +46,13 @@ public interface Roadable {
     Vec2 getStartPosition();
 
     /**
+     * Set the traffic from code
+     *
+     * @param traffic The traffic in vehicle per minutes.
+     */
+    void setTraffic(double traffic);
+
+    /**
      * Get the car rotation. This calculation is done with the whole vehicle
      * in argument to increase animation details one day...
      *
@@ -77,4 +84,12 @@ public interface Roadable {
      * @return False if the vehicle finished it's course
      */
     boolean moveVehicle(Vehicle v, double distance);
+
+    /**
+     * Update the internal timer with the DT and return true when the spawn timer finished.
+     * @param dt The delta time (time since the last update)
+     *
+     * @return True when a new vehicle should spawn.
+     */
+    boolean shouldSpawnVehicle(double dt);
 }

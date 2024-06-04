@@ -1,5 +1,6 @@
 package app.roadtrafficsimulator.workers;
 
+import app.roadtrafficsimulator.beans.Car;
 import app.roadtrafficsimulator.beans.Circuit;
 import app.roadtrafficsimulator.beans.Roadable;
 import app.roadtrafficsimulator.beans.Vehicle;
@@ -14,21 +15,24 @@ public class SimulationWrk {
         thr = null;
     }
 
-    public void start(Circuit circuit) {
+    public void start(Circuit circuit, double speedFactor) {
         if (circuit == null)
             throw new RuntimeException("Cannot simulate a null circuit");
 
+        this.speedFactor = speedFactor;
         this.circuit = circuit;
         running = true;
         thr = new Thread(this::run);
         thr.start();
     }
 
-    public void stop() {
+    public void terminate() {
         try {
             running = false;
-            thr.join();
-            thr = null;
+            if (thr != null) {
+                thr.join();
+                thr = null;
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException("Failed to stop the simulation: " + e.getMessage());
         }
@@ -39,18 +43,37 @@ public class SimulationWrk {
         while (running) {
             // Calculate deltatime (time change since the last time)
             long time = System.nanoTime();
-            double deltaTime = ((time - lastTime) / 1000000000.0);
+            double deltaTime = ((time - lastTime) / 1000000000.0) * speedFactor;
             lastTime = time;
 
-            // Update all
+            // Update all vehicle
             ArrayList<Vehicle> toDestroy = new ArrayList<>();
             for (Vehicle v : circuit.getVehicles()) {
                 if (!update(v, deltaTime))
                     toDestroy.add(v);
             }
 
+            // Remove vehicles to destroy
             for (Vehicle v : toDestroy) {
                 wrk.removeVehicle(v);
+            }
+
+            // Generate new cars on road
+            for (Roadable rd : circuit.getRoads())
+            {
+                if (rd.shouldSpawnVehicle(deltaTime)) {
+                    wrk.addVehicle(getCar(rd));
+                }
+            }
+
+            // Sleeping to ease the JavaFX Thread
+            // If we go too fast, the animation will become jiggly and some
+            // bindings will die.
+            // See the problem N°3 to better understand!
+            try {
+                Thread.sleep(16);
+            } catch (InterruptedException e) {
+                // Ignore
             }
         }
     }
@@ -63,17 +86,10 @@ public class SimulationWrk {
         double accelerationVelocity = v.getAcceleration() * dt;
         double decelerationVelocity = v.getDeceleration() * dt;
 
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {}
-
         // Modify speed on acceleration: d/t + d/t
         speed += speed > road.getSpeedLimit()
                 ? decelerationVelocity
                 : accelerationVelocity;
-        System.out.println(speed > road.getSpeedLimit()
-                ? decelerationVelocity
-                : accelerationVelocity);
 
         v.setSpeed(speed);
 
@@ -84,8 +100,13 @@ public class SimulationWrk {
         return road.moveVehicle(v, distance);
     }
 
+    private Car getCar(Roadable rd) {
+        return new Car(wrk.getCarTexture(), (Car)circuit.getDefaultVehicle(), rd);
+    }
+
     private ISimulationWrk wrk;
     private Thread thr;
     private volatile boolean running;
     private volatile Circuit circuit;
+    private volatile double speedFactor;
 }

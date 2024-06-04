@@ -120,6 +120,11 @@ public class LoginCtrl implements ICtrl {
         throw new UnexpectedException("You can't remove a vehicle from the login view...");
     }
 
+    @Override
+    public double getSpeedFactor() {
+        throw new UnexpectedException("You can't get the speed factor of the login view...");
+    }
+
     private void nextView() {
         app.loadView(App.SIMULATION_VIEW);
     }

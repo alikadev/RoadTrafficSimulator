@@ -1,10 +1,7 @@
 package app.roadtrafficsimulator.controllers;
 
 import app.roadtrafficsimulator.App;
-import app.roadtrafficsimulator.beans.Circuit;
-import app.roadtrafficsimulator.beans.Roadable;
-import app.roadtrafficsimulator.beans.Vec2;
-import app.roadtrafficsimulator.beans.Vehicle;
+import app.roadtrafficsimulator.beans.*;
 import app.roadtrafficsimulator.exceptions.NotImplementedYet;
 import app.roadtrafficsimulator.helper.EasyPopup;
 import app.roadtrafficsimulator.helper.FX;
@@ -54,9 +51,10 @@ public class SimulationCtrl implements ICtrl {
         app = null;
 
 
-        settingsField = new TextField("1");
+        settingsField = new TextField("");
         pixelPerMeter = FX.set(new TextField("6"), (node) -> node.setOnAction(this::updatePixelPerMeter));
-        speedFactor = new TextField("1");
+        speedFactor = FX.set(new TextField("1"), (node) -> node.setOnAction(this::checkSpeedFactor));
+        vehicleSettings = new VBox();
 
         settingsTab = new Tab("Réglages",
                 FX.set(new VBox(10,
@@ -75,7 +73,8 @@ public class SimulationCtrl implements ICtrl {
                         FX.set(new Label("Simulation"), node -> node.setFont(FONT_TITLE)),
                         new VBox(new Label("Pixels par mètre"), pixelPerMeter),
                         new VBox(new Label("Facteur de vitesse"), speedFactor),
-                        FX.set(new Label("Véhicules"), node -> node.setFont(FONT_TITLE))
+                        FX.set(new Label("Véhicules"), node -> node.setFont(FONT_TITLE)),
+                        vehicleSettings // The wrk might still be null now. We'll load these settings on start instead
                 ), node -> { VBox.setVgrow(node, Priority.ALWAYS); node.getStyleClass().add("tab_content"); })
         );
     }
@@ -160,6 +159,17 @@ public class SimulationCtrl implements ICtrl {
 
     @Override
     public void start() {
+        // Load vehicle settings
+        for (InputField in : wrk.getCircuit().getDefaultVehicle().getProperties()) {
+            vehicleSettings.getChildren().add(
+                    new VBox(
+                            new Label(in.getValueLabel()),
+                            FX.set(new TextField(), t -> t.textProperty().bindBidirectional(in.valueProperty()))
+                            // TODO: Add tolerance
+                    )
+            );
+        }
+
         editMenu.getTabs().add(settingsTab);
         editMenu.getTabs().add(generalTab);
 
@@ -199,11 +209,29 @@ public class SimulationCtrl implements ICtrl {
     @Override
     public void removeVehicle(Vehicle v) {
         Platform.runLater(() -> {
-            // TODO: Find a better way to directly remove this node without clearing all nodes.
-            foreground.getChildren().clear();
-            for (Vehicle vehicle : wrk.getCircuit().getVehicles())
-                foreground.getChildren().add(vehicle.draw());
+            for (Node n : foreground.getChildren()) {
+                Node vn = v.draw();
+                if (n.getLayoutX() == vn.getLayoutX()
+                        && n.getLayoutY() == vn.getLayoutY()) {
+                    foreground.getChildren().remove(n);
+                    break;
+                }
+            }
         });
+    }
+
+    void checkSpeedFactor(ActionEvent ev) {
+        try {
+            Double.parseDouble(speedFactor.getText());
+        } catch (NumberFormatException e) {
+            EasyPopup.displayError("Erreur de format", "Un nombre était attendu", "Le format du champ est invalide!", true);
+            speedFactor.setText("1");
+        }
+    }
+
+    @Override
+    public double getSpeedFactor() {
+        return Double.parseDouble(speedFactor.getText());
     }
 
     @Override
@@ -215,6 +243,11 @@ public class SimulationCtrl implements ICtrl {
      * The reference to the worker.
      */
     private ICtrlWrk wrk;
+
+    /**
+     * This is the place where the vehicle settings will be put in...
+     */
+    private VBox vehicleSettings;
 
     /**
      * The reference to the app.

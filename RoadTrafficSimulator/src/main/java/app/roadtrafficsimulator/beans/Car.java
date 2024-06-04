@@ -97,10 +97,8 @@ public class Car implements Vehicle {
         c.getGraphicsContext2D().drawImage(texture, 0, 0);
 
         // Set position
-        Vec2 halfCarWidth = new Vec2(Roadable.WIDTH/2);
-        Vec2 pos = getPosition().sub(halfCarWidth);
-        c.layoutXProperty().bindBidirectional(position.getXProperty());
-        c.setLayoutY(pos.getY());
+        c.layoutXProperty().bind(position.getXProperty().subtract(Roadable.WIDTH/2));
+        c.layoutYProperty().bind(position.getYProperty().subtract(Roadable.WIDTH/2));
 
         // Downscale the canvas
         double scale = texture.getWidth() / Roadable.WIDTH;

@@ -62,6 +62,7 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
         return iv;
     }
 
+    @Override
     public ImageView getCarTexture() {
         int randomId = (int)(Math.random() * carTextures.size());
         ImageView iv = new ImageView(carTextures.get(randomId));
@@ -76,6 +77,7 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
         Road rd1 = new Road(getRoadTexture(), new Vec2(-40,0), Direction.RIGHT, 40, 70 * Physics.KM_H);
         Road rd2 = new Road(getRoadTexture(), new Vec2(0,0), Direction.RIGHT, 40, 30 * Physics.KM_H);
         rd1.setNext(rd2);
+        rd1.setTraffic(60);
         rds.add(rd1);
         rds.add(rd2);
 
@@ -86,15 +88,12 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
 
     public void start() throws DBException {
         db.start();
-        /// TMP ///
-        Vehicle v = new Car(getCarTexture(), (Car)circuit.getDefaultVehicle(), circuit.getRoads().get(0));
-        addVehicle(v);
-        /// END TMP ///
     }
 
     public void terminate() throws RuntimeException {
         try {
             db.terminate();
+            simulator.terminate();
         } catch (DBException e) {
             throw new RuntimeException(e);
         }
@@ -120,12 +119,12 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
 
     @Override
     public void startSimulation() {
-        simulator.start(circuit);
+        simulator.start(circuit, ctrl.getSpeedFactor());
     }
 
     @Override
     public void stopSimulation() {
-        simulator.stop();
+        simulator.terminate();
     }
 
     @Override
