@@ -73,8 +73,8 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
     private Circuit circuitStraightRoad() {
         Circuit circuit = new Circuit();
         ArrayList<Roadable> rds = new ArrayList<>();
-        Road rd1 = new Road(getRoadTexture(), new Vec2(-30,0), Direction.RIGHT, 30, 70 * Physics.KM_H);
-        Road rd2 = new Road(getRoadTexture(), new Vec2(0,0), Direction.RIGHT, 40, 50 * Physics.KM_H);
+        Road rd1 = new Road(getRoadTexture(), new Vec2(-40,0), Direction.RIGHT, 40, 70 * Physics.KM_H);
+        Road rd2 = new Road(getRoadTexture(), new Vec2(0,0), Direction.RIGHT, 40, 30 * Physics.KM_H);
         rd1.setNext(rd2);
         rds.add(rd1);
         rds.add(rd2);

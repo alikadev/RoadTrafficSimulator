@@ -127,8 +127,9 @@ public class Road implements Roadable {
         // Check if we finish this road "tile"
         if (endDistance < distance) {
             // Check if road is finished
-            if (next == null)
+            if (next == null) {
                 return false;
+            }
 
             // Switch to next road and continue updating...
             v.setRoad(next);
@@ -136,8 +137,7 @@ public class Road implements Roadable {
         }
 
         // Calculate new position
-        Vec2 change = endVector.normal().mul(distance);
-        v.setPosition(v.getPosition().add(change));
+        v.move(endVector.normal().mul(distance));
         return true;
     }
 
@@ -237,7 +237,7 @@ public class Road implements Roadable {
     /**
      * The size input field of the road.
      */
-    private InputField size;
+    private final InputField size;
 
     /**
      * The traffic input field of the road.
@@ -252,7 +252,7 @@ public class Road implements Roadable {
     /**
      * The head position of the road.
      */
-    private Vec2 headPosition;
+    private final Vec2 headPosition;
 
     /**
      * The properties of the road.

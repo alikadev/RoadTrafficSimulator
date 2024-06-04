@@ -25,7 +25,7 @@ public interface Vehicle {
     void setRoad(Roadable road);
     Roadable getRoad();
     Vec2 getPosition();
-    void setPosition(Vec2 position);
+    void move(Vec2 offset);
     double getReactionTime();
     double getDeceleration();
     double getBreakingSpeed();

@@ -71,6 +71,9 @@ public class SimulationWrk {
         speed += speed > road.getSpeedLimit()
                 ? decelerationVelocity
                 : accelerationVelocity;
+        System.out.println(speed > road.getSpeedLimit()
+                ? decelerationVelocity
+                : accelerationVelocity);
 
         v.setSpeed(speed);
 

@@ -31,8 +31,8 @@ public class Vec2 {
      * @param v The value for X and Y.
      */
     public Vec2(Vec2 v) {
-        this.x = v.x;
-        this.y = v.y;
+        this.x = new SimpleDoubleProperty(v.x.get());
+        this.y = new SimpleDoubleProperty(v.y.get());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class Vec2 {
 
     /**
      * Add a value. (a, b) + x = (a + x, b + x)
-     * @param f The other vector.
+     * @param a The other vector.
      * @return The resulting vector.
      */
     public Vec2 add(double a) {

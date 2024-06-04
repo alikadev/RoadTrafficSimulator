@@ -99,7 +99,7 @@ public class Car implements Vehicle {
         // Set position
         Vec2 halfCarWidth = new Vec2(Roadable.WIDTH/2);
         Vec2 pos = getPosition().sub(halfCarWidth);
-        c.setLayoutX(pos.getX());
+        c.layoutXProperty().bindBidirectional(position.getXProperty());
         c.setLayoutY(pos.getY());
 
         // Downscale the canvas
@@ -145,11 +145,11 @@ public class Car implements Vehicle {
     /**
      * Sets the position of the car.
      *
-     * @param position the new position of the car
+     * @param offset the new position of the car
      */
-    @Override
-    public void setPosition(Vec2 position) {
-        this.position = position;
+    public void move(Vec2 offset) {
+        position.setX(position.getX() + offset.getX());
+        position.setY(position.getY() + offset.getY());
     }
 
     /**
