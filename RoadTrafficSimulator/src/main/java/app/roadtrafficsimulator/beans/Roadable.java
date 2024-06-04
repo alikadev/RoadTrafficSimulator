@@ -15,8 +15,6 @@ import java.util.Map;
  * @autor Elvin Kuci
  */
 public interface Roadable {
-    //Map<Direction, List<Pair<TrafficLight, Roadable>>> getDirectionalTrafficMap();
-
     /**
      * Returns the directional traffic map of the road.
      *
@@ -92,4 +90,11 @@ public interface Roadable {
      * @return True when a new vehicle should spawn.
      */
     boolean shouldSpawnVehicle(double dt);
+
+    /**
+     * Get the map of the road settings and values
+     *
+     * @return The setting id to value map
+     */
+    Map<String, Double> getValues();
 }

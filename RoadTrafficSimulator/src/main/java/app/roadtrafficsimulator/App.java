@@ -58,7 +58,7 @@ public class App extends Application {
         });
 
         // Load the basic view
-        loadView(SIMULATION_VIEW);
+        loadView(LOGIN_VIEW);
 
         // Start!
         try {

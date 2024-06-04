@@ -7,6 +7,8 @@ import app.roadtrafficsimulator.exceptions.DBException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -122,6 +124,29 @@ public class DBWrk {
             return rs.getInt(1) == 1;
         } catch (SQLException e) {
             throw new DBException("Un problème est apparue durant la vérification du compte: " + e.getMessage());
+        }
+    }
+
+    public List<String> getSettingsList(Account account) throws DBException {
+        final String QUERY = "SELECT DISTINCT setname FROM accountsetting WHERE account=?;";
+        try {
+            // Check if DB connection is open
+            if (connection == null || connection.isClosed())
+                throw new DBException("La connection à la base de donnée n'a pas été ouverte");
+
+            // Create and process the request
+            PreparedStatement ps = connection.prepareStatement(QUERY);
+            ps.setString(1, account.getName());
+            ResultSet rs = ps.executeQuery();
+
+            // Check if the request exist
+            List<String> sets = new ArrayList<>();
+            while (rs.next()) {
+                sets.add(rs.getString(1));
+            }
+            return sets;
+        } catch (SQLException e) {
+            throw new DBException("Un problème est apparue durant la récupération des jeux de réglages: " + e.getMessage());
         }
     }
 

@@ -14,6 +14,7 @@ import javafx.scene.transform.Scale;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,19 +22,20 @@ import java.util.Map;
  * Represents a road that can create new vehicles.
  * Provides methods to get and set its properties.
  *
- * @autor Elvin Kuci
+ * @author Elvin Kuci
  */
 public class Road implements Roadable {
     /**
      * Constructs a Road with the specified head position, direction, size, and traffic density.
      *
+     * @param id The id of the road
      * @param iv The ImageView that will be used to draw the road
      * @param headPosition the head position of the road
      * @param direction the direction of the road traffic
      * @param size the size of the road (in meters)
      * @param speedLimit the speed limit of the road (in kilometers per hour)
      */
-    public Road(ImageView iv, Vec2 headPosition, Direction direction, double size, double speedLimit) {
+    public Road(String id, ImageView iv, Vec2 headPosition, Direction direction, double size, double speedLimit) {
         this.speedLimit = new InputField("Vitesse (km/h)", speedLimit, "+-", 0);
         this.size = new InputField("Size (m)", size);
         this.traffic = new InputField("Densitée (véhicule/m)", 0);
@@ -46,6 +48,7 @@ public class Road implements Roadable {
         props.add(this.traffic);
 
         timer = 0;
+        this.id = id;
 
         switch (direction) {
             case RIGHT:
@@ -94,7 +97,7 @@ public class Road implements Roadable {
         // Scale between the road and the texture
         double scale = texture.getWidth() / Roadable.WIDTH;
 
-        // Calculate positon and size
+        // Calculate position and size
         Vec2 halfRoadWidth = new Vec2(Roadable.WIDTH/2);
         Vec2 pos = getStartPosition().sub(halfRoadWidth);
         // Upscale the size to be able to draw all the pixels
@@ -167,6 +170,15 @@ public class Road implements Roadable {
         }
 
         return false;
+    }
+
+    @Override
+    public Map<String, Double> getValues() {
+        HashMap<String, Double> map = new HashMap<>();
+        map.put(id + "::speedLimit", speedLimit.getValue());
+        map.put(id + "::size", size.getValue());
+        map.put(id + "::traffic", getTraffic().getValue());
+        return map;
     }
 
     /**
@@ -252,20 +264,25 @@ public class Road implements Roadable {
     }
 
     /**
+     * The ID of the road
+     */
+    private final String id;
+
+    /**
      * The rendered rectangle
      */
-    Canvas canvas;
+    private Canvas canvas;
 
     /**
      * The image to render on the road.
      * It should be already transformed (rotated, ...) before the `draw` call.
      */
-    Image texture;
+    private final Image texture;
 
     /**
      * The speed limit input field of the road. (Value is in km/h)
      */
-    private InputField speedLimit;
+    private final InputField speedLimit;
 
     /**
      * The size input field of the road.
