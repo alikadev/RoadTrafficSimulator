@@ -2,6 +2,7 @@ package app.roadtrafficsimulator.controllers;
 
 import app.roadtrafficsimulator.App;
 import app.roadtrafficsimulator.beans.*;
+import app.roadtrafficsimulator.exceptions.DBException;
 import app.roadtrafficsimulator.exceptions.NotImplementedYet;
 import app.roadtrafficsimulator.helper.EasyPopup;
 import app.roadtrafficsimulator.helper.FX;
@@ -35,8 +36,7 @@ import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import javafx.util.StringConverter;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
@@ -57,10 +57,11 @@ public class SimulationCtrl implements ICtrl {
         pixelPerMeter = FX.set(new TextField("6"), (node) -> node.setOnAction(this::updatePixelPerMeter));
         speedFactor = FX.set(new TextField("1"), (node) -> node.setOnAction(this::checkSpeedFactor));
         vehicleSettings = new VBox();
+        setList = new ListView<String>();
 
         settingsTab = new Tab("Réglages",
                 FX.set(new VBox(10,
-                        new ScrollPane(new ListView<String>()),
+                        new ScrollPane(setList),
                         new HBox(10,
                                 FX.set(new Button("Charger"), node -> node.setOnMouseClicked(this::loadSettings)),
                                 FX.set(new Button("Sauvegarder"), node -> node.setOnMouseClicked(this::saveSettings))
@@ -122,7 +123,30 @@ public class SimulationCtrl implements ICtrl {
      * @param ev The event, ignored.
      */
     private void loadSettings(MouseEvent ev) {
-        throw new NotImplementedYet("loadSettings");
+        // Check if exactly 1 element in the list is selected
+        List<String> selected = setList.getSelectionModel().getSelectedItems();
+        if (selected.isEmpty()) {
+            EasyPopup.displayError("Erreur", "Aucun jeu de réglages n'a été séléctionnée", "Vous devez séléctionner un jeu de réglages pour effectuer cette opération!", true);
+            return;
+        } else if (selected.size() > 1) {
+            EasyPopup.displayError("Erreur", "Trop jeux de réglages sont été séléctionnées", "Vous ne devez séléctionner qu'un seul jeu de réglages pour effectuer cette opération!", true);
+            return;
+        }
+        String setName = selected.get(0);
+
+        // Load the settings
+        SettingsSet set;
+        try {
+            set = wrk.loadSettingsSet(setName);
+        } catch (DBException e) {
+            EasyPopup.displayError("Erreur lors de la sauvegarde", "Une erreur c'est produite durant la sauvegarde du jeu de réglages.", e.getMessage(), false);
+            return;
+        }
+
+        // Apply the set
+        wrk.applySettingsSet(set);
+
+        EasyPopup.displayInfo("Succès", "Succès durant le chargement du jeu de réglages", "Le jeu de réglages `" + setName + "` à bel et bien été charger!", false);
     }
 
     /**
@@ -130,15 +154,33 @@ public class SimulationCtrl implements ICtrl {
      * @param ev The event, ignored.
      */
     private void saveSettings(MouseEvent ev) {
-        throw new NotImplementedYet("saveSettings");
-    }
+        // Check if exactly 1 element in the list is selected
+        List<String> selected = setList.getSelectionModel().getSelectedItems();
+        if (selected.isEmpty()) {
+            EasyPopup.displayError("Erreur", "Aucun jeu de réglages n'a été séléctionnée", "Vous devez séléctionner un jeu de réglages pour effectuer cette opération!", true);
+            return;
+        } else if (selected.size() > 1) {
+            EasyPopup.displayError("Erreur", "Trop jeux de réglages sont été séléctionnées", "Vous ne devez séléctionner qu'un seul jeu de réglages pour effectuer cette opération!", true);
+            return;
+        }
+        String setName = selected.get(0);
 
-    /**
-     * When you click on a road, this will be triggerd
-     * @param ev The event, ignored.
-     */
-    private void editRoad(MouseEvent ev) {
-        throw new NotImplementedYet("saveSettings");
+        // Get circuit's settings
+        Map<String, Double> map = new HashMap<>();
+        for (Roadable rd : wrk.getCircuit().getRoads()) {
+            map.putAll(rd.getSettings());
+        }
+
+        // Save them
+        try {
+            wrk.updateSettingsSet(new SettingsSet(setName, map));
+        } catch (DBException e) {
+            EasyPopup.displayError("Erreur lors de la sauvegarde", "Une erreur c'est produite durant la sauvegarde du jeu de réglages.", e.getMessage(), false);
+            return;
+        }
+
+        // Add and confirm success to the user
+        EasyPopup.displayInfo("Succès", "Succès durant la création du jeu de réglages", "Le jeu de réglages `" + setName + "` à bel et bien été sauvegarder!", false);
     }
 
     /**
@@ -146,7 +188,30 @@ public class SimulationCtrl implements ICtrl {
      * @param ev The event, ignored.
      */
     private void createSettings(MouseEvent ev) {
-        throw new NotImplementedYet("createSettings");
+        // Check if the required field is not empty
+        String setName = settingsField.getText();
+        if (setName.isEmpty()) {
+            settingsField.getStyleClass().add("field_error");
+            return;
+        }
+
+        // Get circuit's settings
+        Map<String, Double> map = new HashMap<>();
+        for (Roadable rd : wrk.getCircuit().getRoads()) {
+            map.putAll(rd.getSettings());
+        }
+
+        // Save them
+        try {
+            wrk.createSettingsSet(new SettingsSet(setName, map));
+        } catch (DBException e) {
+            EasyPopup.displayError("Erreur lors de la sauvegarde", "Une erreur c'est produite durant la sauvegarde du jeu de réglages.", e.getMessage(), false);
+            return;
+        }
+
+        // Add and confirm success to the user
+        setList.getItems().add(setName);
+        EasyPopup.displayInfo("Succès", "Succès durant la création du jeu de réglages", "Le jeu de réglages `" + setName + "` à bel et bien été sauvegarder!", false);
     }
 
     @Override
@@ -161,6 +226,14 @@ public class SimulationCtrl implements ICtrl {
 
     @Override
     public void start() {
+        // Load all settings set
+        try {
+            List<String> sets = wrk.getSettingsSetsList();
+            setList.getItems().setAll(sets);
+        } catch (DBException e) {
+            EasyPopup.displayError("Erreur lors du chargement", "Une erreur c'est produite durant le chargement de la liste de jeu de réglages.", e.getMessage(), false);
+        }
+
         // Load vehicle settings
         for (InputField in : wrk.getCircuit().getDefaultVehicle().getProperties()) {
             vehicleSettings.getChildren().add(
@@ -240,7 +313,6 @@ public class SimulationCtrl implements ICtrl {
     public void addVehicle(Vehicle v) {
         Platform.runLater(() -> {
             Node node = v.draw();
-            node.setOnMouseClicked(this::editRoad);
             node.translateXProperty().bind(foreground.widthProperty().divide(2.f));
             node.translateYProperty().bind(foreground.heightProperty().divide(2.f));
             foreground.getChildren().add(node);
@@ -289,6 +361,11 @@ public class SimulationCtrl implements ICtrl {
      * This is the place where the vehicle settings will be put in...
      */
     private VBox vehicleSettings;
+
+    /**
+     * The list of sets that are currently available.
+     */
+    private ListView<String> setList;
 
     /**
      * The reference to the app.

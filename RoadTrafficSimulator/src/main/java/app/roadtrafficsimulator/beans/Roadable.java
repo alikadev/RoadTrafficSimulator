@@ -61,7 +61,6 @@ public interface Roadable {
 
     /**
      * Standard size of a road in Switzerland
-     *
      * See the <a href="https://ge.ch/grandconseil/data/texte/PL12730A.pdf">source</a> here
      */
     static double WIDTH = (6.4 * Physics.METER) / 2;
@@ -76,25 +75,34 @@ public interface Roadable {
     /**
      * Move the vehicle on the road. Might change the vehicle's road or request
      * to be destroyed (end of road).
+     *
      * @param v The vehicle to move
      * @param distance The distance to move
      *
-     * @return False if the vehicle finished it's course
+     * @return False if the vehicle finished its course
      */
     boolean moveVehicle(Vehicle v, double distance);
 
     /**
      * Update the internal timer with the DT and return true when the spawn timer finished.
-     * @param dt The delta time (time since the last update)
+     *
+     * @param dt The delta time (time since the last update).
      *
      * @return True when a new vehicle should spawn.
      */
     boolean shouldSpawnVehicle(double dt);
 
     /**
-     * Get the map of the road settings and values
+     * Get the map of the road settings and values.
      *
-     * @return The setting id to value map
+     * @return The setting id to value map.
      */
-    Map<String, Double> getValues();
+    Map<String, Double> getSettings();
+
+    /**
+     * Set the settings from a map of setting id to value.
+     *
+     * @param settings The map of setting id to value.
+     */
+    void setSettings(Map<String, Double> settings);
 }

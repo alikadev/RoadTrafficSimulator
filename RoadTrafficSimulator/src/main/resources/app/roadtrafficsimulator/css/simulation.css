@@ -13,3 +13,9 @@ Button {
     -fx-border-width: 1;
     -fx-border-color: lightgray;
 }
+
+.field_error {
+    -fx-border-color: red;
+    -fx-border-width: 2;
+    -fx-border-radius: 2;
+}

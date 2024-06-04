@@ -2,13 +2,17 @@ package app.roadtrafficsimulator.workers;
 
 
 import app.roadtrafficsimulator.beans.Account;
+import app.roadtrafficsimulator.beans.SettingsSet;
 import app.roadtrafficsimulator.exceptions.DBException;
+import app.roadtrafficsimulator.exceptions.UnexpectedException;
+import com.google.protobuf.Value;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -81,7 +85,12 @@ public class DBWrk {
      * @throws DBException The database Exception
      */
     public void insertAccount(Account account) throws DBException {
-        final String QUERY = "INSERT INTO Account VALUES (?, ?);";
+        final String QUERY = "INSERT INTO account VALUES (?, ?);";
+
+        // Check argument
+        if (account == null)
+            throw new UnexpectedException("insertAccount got an unexpected null argument");
+
         try {
             // Check if DB connection is open
             if (connection == null || connection.isClosed())
@@ -105,6 +114,11 @@ public class DBWrk {
      */
     public boolean verifyAccount(Account account) throws DBException {
         final String QUERY = "SELECT password LIKE ? AS result FROM account WHERE id = ?;";
+
+        // Check argument
+        if (account == null)
+            throw new UnexpectedException("verifyAccount got an unexpected null argument");
+
         try {
             // Check if DB connection is open
             if (connection == null || connection.isClosed())
@@ -127,8 +141,13 @@ public class DBWrk {
         }
     }
 
-    public List<String> getSettingsList(Account account) throws DBException {
+    public List<String> getSettingsSetsList(Account account) throws DBException {
         final String QUERY = "SELECT DISTINCT setname FROM accountsetting WHERE account=?;";
+
+        // Check argument
+        if (account == null)
+            throw new UnexpectedException("getSettingsSetsList got an unexpected null argument");
+
         try {
             // Check if DB connection is open
             if (connection == null || connection.isClosed())
@@ -145,6 +164,104 @@ public class DBWrk {
                 sets.add(rs.getString(1));
             }
             return sets;
+        } catch (SQLException e) {
+            throw new DBException("Un problème est apparue durant la récupération des jeux de réglages: " + e.getMessage());
+        }
+    }
+
+    public void insertSettingsSet(Account account, SettingsSet set) throws DBException {
+        final String QUERY = "INSERT INTO AccountSetting VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE value=?;";
+        //                                                       ^  ^  ^  ^                                ^
+        //                                                 Account  |  |  SetName                       Value
+        //                                                SettingName  Value
+
+        // Check argument
+        if (account == null || set == null)
+            throw new UnexpectedException("insertSettingsSet got an unexpected null argument");
+
+        try {
+            // Check if DB connection is open
+            if (connection == null || connection.isClosed())
+                throw new DBException("La connection à la base de donnée n'a pas été ouverte");
+
+            for (String key : set.getSettings().keySet()) {
+                Double value = set.getSettings().get(key);
+
+                // Create and process the request
+                PreparedStatement ps = connection.prepareStatement(QUERY);
+                ps.setString(1, account.getName());
+                ps.setString(2, key);
+                ps.setDouble(3, value);
+                ps.setString(4, set.getName());
+                ps.setDouble(5, value);
+
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DBException("Un problème est apparue durant la récupération des jeux de réglages: " + e.getMessage());
+        }
+    }
+
+    public boolean containsSettingsSet(Account account, String setName) throws DBException {
+        final String QUERY = "SELECT 1 FROM dual  WHERE EXISTS(SELECT 1 FROM accountsetting WHERE account LIKE ? AND setname LIKE ? );";
+
+        // Check argument
+        if (account == null || setName == null)
+            throw new UnexpectedException("containsSettingsSet got an unexpected null argument");
+
+        try {
+            // Check if DB connection is open
+            if (connection == null || connection.isClosed())
+                throw new DBException("La connection à la base de donnée n'a pas été ouverte");
+
+            // Create and process the request
+            PreparedStatement ps = connection.prepareStatement(QUERY);
+            ps.setString(1, account.getName());
+            ps.setString(2, setName);
+
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            throw new DBException("Un problème est apparue durant la récupération des jeux de réglages: " + e.getMessage());
+        }
+    }
+
+    public SettingsSet getSettingsSet(Account account, String setName) throws DBException {
+        final String QUERY =
+                "SELECT " +
+                "  st.id AS setting, " +
+                // In case of NULL value, use the setting's default one
+                "  CASE WHEN acst.value IS NULL THEN st.default ELSE acst.value END AS value " +
+                "FROM AccountSetting AS acst " +
+                "RIGHT JOIN Setting AS st " +
+                "  ON acst.setting = st.id " +
+                "    AND acst.account = ? " +
+                "    AND acst.setname = ?;";
+
+        // Check argument
+        if (account == null || setName == null)
+            throw new UnexpectedException("containsSettingsSet got an unexpected null argument");
+
+        // Pre init the set
+        SettingsSet set = new SettingsSet(setName);
+
+        try {
+            // Check if DB connection is open
+            if (connection == null || connection.isClosed())
+                throw new DBException("La connection à la base de donnée n'a pas été ouverte");
+
+            // Create and process the request
+            PreparedStatement ps = connection.prepareStatement(QUERY);
+            ps.setString(1, account.getName());
+            ps.setString(2, setName);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                set.getSettings().put(rs.getString(1), rs.getDouble(2));
+            }
+
+            return set;
         } catch (SQLException e) {
             throw new DBException("Un problème est apparue durant la récupération des jeux de réglages: " + e.getMessage());
         }

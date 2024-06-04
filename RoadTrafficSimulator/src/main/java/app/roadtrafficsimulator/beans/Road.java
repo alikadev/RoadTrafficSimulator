@@ -173,12 +173,34 @@ public class Road implements Roadable {
     }
 
     @Override
-    public Map<String, Double> getValues() {
+    public Map<String, Double> getSettings() {
         HashMap<String, Double> map = new HashMap<>();
-        map.put(id + "::speedLimit", speedLimit.getValue());
-        map.put(id + "::size", size.getValue());
-        map.put(id + "::traffic", getTraffic().getValue());
+        map.put(id + "-speedLimit", speedLimit.getValue());
+        map.put(id + "-size", size.getValue());
+        map.put(id + "-traffic", getTraffic().getValue());
         return map;
+    }
+
+    @Override
+    public void setSettings(Map<String, Double> settings) {
+        for (String key : settings.keySet()) {
+            if (key.contains(id)) {
+                String subKey = key.substring(id.length());
+                switch (subKey) {
+                    case "-speedLimit":
+                        speedLimit.valueProperty().setValue(settings.get(key).toString());
+                        break;
+                    case "-size":
+                        size.valueProperty().setValue(settings.get(key).toString());
+                        break;
+                    case "-traffic":
+                        traffic.valueProperty().setValue(settings.get(key).toString());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
     /**

@@ -109,7 +109,42 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
     @Override
     public boolean verifyAccount(Account account) throws DBException {
         account.setPassword(HashWrk.hash(account.getPassword()));
-        return db.verifyAccount(account);
+        if (db.verifyAccount(account)) {
+            this.account = account;
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public List<String> getSettingsSetsList() throws DBException {
+        return db.getSettingsSetsList(account);
+    }
+
+    @Override
+    public void createSettingsSet(SettingsSet set) throws DBException {
+        if (db.containsSettingsSet(account, set.getName()))
+            throw new DBException("Le jeu de réglages " + set.getName() + " éxiste déjà dans la base de donnée.");
+
+        db.insertSettingsSet(account, set);
+    }
+
+    @Override
+    public void updateSettingsSet(SettingsSet set) throws DBException {
+        db.insertSettingsSet(account, set);
+    }
+
+    @Override
+    public SettingsSet loadSettingsSet(String setName) throws DBException {
+        return db.getSettingsSet(account, setName);
+    }
+
+    @Override
+    public void applySettingsSet(SettingsSet set) {
+        for (Roadable rd : circuit.getRoads()) {
+            rd.setSettings(set.getSettings());
+        }
     }
 
     @Override
