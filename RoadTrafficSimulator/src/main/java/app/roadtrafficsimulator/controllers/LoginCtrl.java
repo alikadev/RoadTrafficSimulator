@@ -1,8 +1,11 @@
 package app.roadtrafficsimulator.controllers;
 
+import app.roadtrafficsimulator.App;
 import app.roadtrafficsimulator.beans.Account;
+import app.roadtrafficsimulator.beans.Vehicle;
 import app.roadtrafficsimulator.exceptions.DBException;
 import app.roadtrafficsimulator.exceptions.LoginException;
+import app.roadtrafficsimulator.exceptions.UnexpectedException;
 import app.roadtrafficsimulator.helper.EasyPopup;
 import app.roadtrafficsimulator.workers.ICtrlWrk;
 import javafx.application.Platform;
@@ -10,15 +13,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Popup;
 
 /**
  * The controller of the "Login and SignIn" view of the application.
  *
- * @author kucie
+ * @author Kuci Elvin
  */
 public class LoginCtrl implements ICtrl {
-
     /**
      * Create the login controller.
      */
@@ -26,13 +27,20 @@ public class LoginCtrl implements ICtrl {
         wrk = null;
     }
 
+    @Override
     public void start() {
     }
 
+    @Override
     public void terminate() {
         Platform.exit();
     }
-    
+
+    /**
+     * This methode is called when the user click on the "Login" button.
+     *
+     * @param event The action event.
+     */
     @FXML
     private void logIn(ActionEvent event) {
         boolean failed = false;
@@ -59,12 +67,18 @@ public class LoginCtrl implements ICtrl {
             if (!wrk.verifyAccount(new Account(loginAccount.getText(), loginPasswd.getText())))
                 throw new LoginException("Le nom du compte et/ou le mot de passe ne sont pas le bon");
 
-            EasyPopup.displayInfo("Succès", "Succès durant la connection", "Vous êtes bel et bien connecté", true);
+            // Change the view
+            nextView();
         } catch (LoginException | DBException e) {
             EasyPopup.displayError("Erreur", "Erreur durant la connection", e.getMessage(), true);
         }
     }
 
+    /**
+     * This methode is called when the user click on the "Sign In" button.
+     *
+     * @param event The event.
+     */
     @FXML
     private void signIn(ActionEvent event) {
         boolean failed = false;
@@ -99,44 +113,80 @@ public class LoginCtrl implements ICtrl {
 
         // Create the account
         try {
+            // Try to create the account
             Account account = new Account(signinAccount.getText(), signinPasswd.getText());
             wrk.createAccount(account);
-            EasyPopup.displayInfo("Succès", "Succès lors de la création du compte", "Votre compte à bel et bien été créer!", true);
+
+            // Change view
+            nextView();
         } catch (DBException e) {
             EasyPopup.displayError("Erreur", "Erreur durant la création du compte.", e.getMessage(), true);
         }
     }
 
+    @Override
+    public void addVehicle(Vehicle v) {
+        throw new UnexpectedException("You can't add a vehicle on the login view...");
+    }
+
+    @Override
+    public void removeVehicle(Vehicle v) {
+        throw new UnexpectedException("You can't remove a vehicle from the login view...");
+    }
+
+    @Override
+    public double getSpeedFactor() {
+        throw new UnexpectedException("You can't get the speed factor of the login view...");
+    }
+
+    private void nextView() {
+        app.loadView(App.SIMULATION_VIEW);
+    }
+
+    @Override
+    public void setApp(App app) {
+        this.app = app;
+    }
+
+    @Override
     public void setWrk(ICtrlWrk wrk) {
         this.wrk = wrk;
     }
-    
+
     /**
      * The reference to the current worker.
      */
     ICtrlWrk wrk;
-    
+
+    /**
+     * The reference to the current worker.
+     */
+    App app;
 
     /**
      * The login's side "Account" textfield
      */
     @FXML
     private TextField loginAccount;
+
     /**
      * The login's side "Password" textfield
      */
     @FXML
     private PasswordField loginPasswd;
+
     /**
      * The signin's side "Account" textfield
      */
     @FXML
     private TextField signinAccount;
+
     /**
      * The signin's side "Password" textfield
      */
     @FXML
     private PasswordField signinPasswd;
+
     /**
      * The signin's side "Password Confirmation" textfield
      */

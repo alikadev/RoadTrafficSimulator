@@ -38,6 +38,15 @@ CREATE TABLE IF NOT EXISTS `rts_main`.`setting` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
+-- Fill table with the data
+
+INSERT INTO setting VALUES ('RTS-C1-R01-speedLimit', 50.0);
+INSERT INTO setting VALUES ('RTS-C1-R01-size', 40.0);
+INSERT INTO setting VALUES ('RTS-C1-R01-traffic', 30.0);
+
+INSERT INTO setting VALUES ('RTS-C1-R02-speedLimit', 30.0);
+INSERT INTO setting VALUES ('RTS-C1-R02-size', 40.0);
+INSERT INTO setting VALUES ('RTS-C1-R02-traffic', 0.0);
 
 -- -----------------------------------------------------
 -- Table `rts_main`.`accountsetting`
