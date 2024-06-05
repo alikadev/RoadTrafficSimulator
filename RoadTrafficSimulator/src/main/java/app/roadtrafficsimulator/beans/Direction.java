@@ -4,7 +4,7 @@ package app.roadtrafficsimulator.beans;
  * Represents the possible directions for road traffic simulation.
  * The directions are LEFT, TOP, RIGHT, and DOWN.
  *
- * @autor Elvin Kuci
+ * @author Elvin Kuci
  */
 public enum Direction {
     /**

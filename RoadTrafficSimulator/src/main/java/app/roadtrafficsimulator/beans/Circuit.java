@@ -7,7 +7,7 @@ import java.util.List;
  * Represents a circuit containing roads and vehicles.
  * Provides methods to get and set the default vehicle, roads, and vehicles.
  *
- * @autor Elvin Kuci
+ * @author Elvin Kuci
  */
 public class Circuit {
 

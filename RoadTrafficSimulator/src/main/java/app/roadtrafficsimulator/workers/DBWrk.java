@@ -5,24 +5,23 @@ import app.roadtrafficsimulator.beans.Account;
 import app.roadtrafficsimulator.beans.SettingsSet;
 import app.roadtrafficsimulator.exceptions.DBException;
 import app.roadtrafficsimulator.exceptions.UnexpectedException;
-import com.google.protobuf.Value;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
  * This worker is used to communicate with the database
- * @author kucie
+ *
+ * @author Elvin Kuci
  */
 public class DBWrk {
-
     /**
      * Create the DBWorker
+     *
      * @param propsPath The path to the settings file.
      */
     public DBWrk(final String propsPath) {
@@ -32,6 +31,7 @@ public class DBWrk {
 
     /**
      * Read the property file and open the connection with the Database
+     *
      * @throws DBException In case of an error, it will be there!
      */
     public void start() throws DBException {
@@ -68,6 +68,7 @@ public class DBWrk {
 
     /**
      * Close the connection with the database
+     *
      * @throws DBException The exception
      */
     public void terminate() throws DBException {
@@ -81,7 +82,9 @@ public class DBWrk {
 
     /**
      * Insert an account into the database. Will throw an error in case of duplicate
+     *
      * @param account The account.
+     *
      * @throws DBException The database Exception
      */
     public void insertAccount(Account account) throws DBException {
@@ -109,7 +112,9 @@ public class DBWrk {
 
     /**
      * Verify if the password of the account is the same that the one in the DB.
+     *
      * @param account The account. The password should already be hashed
+     *
      * @throws DBException The database Exception
      */
     public boolean verifyAccount(Account account) throws DBException {
@@ -141,6 +146,14 @@ public class DBWrk {
         }
     }
 
+    /**
+     * Get the list of settings set's name created by an account.
+     *
+     * @param account The account. (The password will not be checked)
+     *
+     * @return The list of set's name.
+     * @throws DBException In case of an error, this will be thrown.
+     */
     public List<String> getSettingsSetsList(Account account) throws DBException {
         final String QUERY = "SELECT DISTINCT setname FROM accountsetting WHERE account=?;";
 
@@ -169,6 +182,14 @@ public class DBWrk {
         }
     }
 
+    /**
+     * Insert / Update a settings set in the database.
+     *
+     * @param account The account. (The password will not be checked)
+     * @param set The settings set to insert / update.
+     *
+     * @throws DBException In case of an error, this will be thrown.
+     */
     public void insertSettingsSet(Account account, SettingsSet set) throws DBException {
         final String QUERY = "INSERT INTO AccountSetting VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE value=?;";
         //                                                       ^  ^  ^  ^                                ^
@@ -202,6 +223,16 @@ public class DBWrk {
         }
     }
 
+    /**
+     * Check if the database contains an account's with a settings set with this name.
+     *
+     * @param account The account. (The password will not be checked)
+     * @param setName The set's name.
+     *
+     * @return True when the database contains an account with a sets with this name.
+     *
+     * @throws DBException In case of an error, this will be thrown.
+     */
     public boolean containsSettingsSet(Account account, String setName) throws DBException {
         final String QUERY = "SELECT 1 FROM dual  WHERE EXISTS(SELECT 1 FROM accountsetting WHERE account LIKE ? AND setname LIKE ? );";
 
@@ -226,6 +257,17 @@ public class DBWrk {
         }
     }
 
+    /**
+     * Get a settings set from the database.
+     * Note that in case of an unset setting's value, the default value will be returned.
+     *
+     * @param account The account. (The password will not be checked)
+     * @param setName The settings set name.
+     *
+     * @return The set of settings.
+     *
+     * @throws DBException In case of an error, this will be thrown.
+     */
     public SettingsSet getSettingsSet(Account account, String setName) throws DBException {
         final String QUERY =
                 "SELECT " +

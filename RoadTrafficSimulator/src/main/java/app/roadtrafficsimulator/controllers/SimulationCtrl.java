@@ -3,62 +3,51 @@ package app.roadtrafficsimulator.controllers;
 import app.roadtrafficsimulator.App;
 import app.roadtrafficsimulator.beans.*;
 import app.roadtrafficsimulator.exceptions.DBException;
-import app.roadtrafficsimulator.exceptions.NotImplementedYet;
 import app.roadtrafficsimulator.helper.EasyPopup;
 import app.roadtrafficsimulator.helper.FX;
-import app.roadtrafficsimulator.helper.Physics;
 import app.roadtrafficsimulator.workers.ICtrlWrk;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.transform.Scale;
-import javafx.scene.transform.Transform;
-import javafx.scene.transform.Translate;
-import javafx.util.StringConverter;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
 
 /**
  * This is the controller that will manage the edition and visualisation of the simulation.
+ *
+ * @author Elvin Kuci
  */
 public class SimulationCtrl implements ICtrl {
 
+    /**
+     * This is the default font setting for a title.
+     */
     private static final Font FONT_TITLE = new Font(20);
 
+    /**
+     * Create the simulation controller.
+     */
     public SimulationCtrl() {
+        // Standards...
         wrk = null;
         app = null;
 
-
+        // Setup static fields and box.
         settingsField = new TextField("");
         pixelPerMeter = FX.set(new TextField("6"), (node) -> node.setOnAction(this::updatePixelPerMeter));
         speedFactor = FX.set(new TextField("1"), (node) -> node.setOnAction(this::checkSpeedFactor));
         vehicleSettings = new VBox();
         setList = new ListView<String>();
 
+        // Create the settings tab.
         settingsTab = new Tab("Réglages",
                 FX.set(new VBox(10,
                         new ScrollPane(setList),
@@ -71,26 +60,36 @@ public class SimulationCtrl implements ICtrl {
                 ), node -> { VBox.setVgrow(node, Priority.ALWAYS); node.getStyleClass().add("tab_content"); })
         );
 
+        // Create the general tab
         generalTab = new Tab("Général",
                 FX.set(new VBox(10,
                         FX.set(new Label("Simulation"), node -> node.setFont(FONT_TITLE)),
                         new VBox(new Label("Pixels par mètre"), pixelPerMeter),
                         new VBox(new Label("Facteur de vitesse"), speedFactor),
                         FX.set(new Label("Véhicules"), node -> node.setFont(FONT_TITLE)),
-                        vehicleSettings // The wrk might still be null now. We'll load these settings on start instead
+                        vehicleSettings // The wrk might still be null during this phase. We'll load these settings on start instead
                 ), node -> { VBox.setVgrow(node, Priority.ALWAYS); node.getStyleClass().add("tab_content"); })
         );
     }
 
+    /**
+     * This methode is called when the simulation state needs to be toggled.
+     *
+     * @param ev The event.
+     */
     @FXML
     public void toggleSimulation(ActionEvent ev) {
+        // Toggle the edit menu visibility.
         editMenu.setVisible(!editMenu.isVisible());
+
         if (editMenu.isVisible()) {
+            // Simulation is stopping
             simulationBtn.setText("Démarrer la simulation");
             editMenu.setPrefWidth(200);
             wrk.stopSimulation();
         }
         else {
+            // Simulation is starting
             simulationBtn.setText("Arrêter la simulation");
             editMenu.setPrefWidth(0);
             wrk.startSimulation();
@@ -98,11 +97,13 @@ public class SimulationCtrl implements ICtrl {
     }
 
     /**
-     * Update the pixel per meter render.
-     * @param ev The event, ignored.
+     * This methode is called when the user update the pixel per meter.
+     *
+     * @param ev The event.
      */
     private void updatePixelPerMeter(ActionEvent ev) {
         double ppm;
+        // Parse the value
         try {
             ppm = Double.parseDouble(pixelPerMeter.getText());
         } catch (NumberFormatException e) {
@@ -111,6 +112,7 @@ public class SimulationCtrl implements ICtrl {
             ppm = 1;
         }
 
+        // Apply it to the foreground and background.
         background.setScaleX(ppm);
         background.setScaleY(ppm);
 
@@ -125,6 +127,7 @@ public class SimulationCtrl implements ICtrl {
     private void loadSettings(MouseEvent ev) {
         // Check if exactly 1 element in the list is selected
         List<String> selected = setList.getSelectionModel().getSelectedItems();
+
         if (selected.isEmpty()) {
             EasyPopup.displayError("Erreur", "Aucun jeu de réglages n'a été séléctionnée", "Vous devez séléctionner un jeu de réglages pour effectuer cette opération!", true);
             return;
@@ -132,10 +135,12 @@ public class SimulationCtrl implements ICtrl {
             EasyPopup.displayError("Erreur", "Trop jeux de réglages sont été séléctionnées", "Vous ne devez séléctionner qu'un seul jeu de réglages pour effectuer cette opération!", true);
             return;
         }
+
         String setName = selected.get(0);
 
         // Load the settings
         SettingsSet set;
+
         try {
             set = wrk.loadSettingsSet(setName);
         } catch (DBException e) {
@@ -151,11 +156,13 @@ public class SimulationCtrl implements ICtrl {
 
     /**
      * Save settings to the database.
+     *
      * @param ev The event, ignored.
      */
     private void saveSettings(MouseEvent ev) {
         // Check if exactly 1 element in the list is selected
         List<String> selected = setList.getSelectionModel().getSelectedItems();
+
         if (selected.isEmpty()) {
             EasyPopup.displayError("Erreur", "Aucun jeu de réglages n'a été séléctionnée", "Vous devez séléctionner un jeu de réglages pour effectuer cette opération!", true);
             return;
@@ -163,10 +170,12 @@ public class SimulationCtrl implements ICtrl {
             EasyPopup.displayError("Erreur", "Trop jeux de réglages sont été séléctionnées", "Vous ne devez séléctionner qu'un seul jeu de réglages pour effectuer cette opération!", true);
             return;
         }
+
         String setName = selected.get(0);
 
         // Get circuit's settings
         Map<String, Double> map = new HashMap<>();
+
         for (Roadable rd : wrk.getCircuit().getRoads()) {
             map.putAll(rd.getSettings());
         }
@@ -185,11 +194,13 @@ public class SimulationCtrl implements ICtrl {
 
     /**
      * Create new settings group in the database.
+     *
      * @param ev The event, ignored.
      */
     private void createSettings(MouseEvent ev) {
         // Check if the required field is not empty
         String setName = settingsField.getText();
+
         if (setName.isEmpty()) {
             settingsField.getStyleClass().add("field_error");
             return;
@@ -197,6 +208,7 @@ public class SimulationCtrl implements ICtrl {
 
         // Get circuit's settings
         Map<String, Double> map = new HashMap<>();
+
         for (Roadable rd : wrk.getCircuit().getRoads()) {
             map.putAll(rd.getSettings());
         }
@@ -211,6 +223,7 @@ public class SimulationCtrl implements ICtrl {
 
         // Add and confirm success to the user
         setList.getItems().add(setName);
+
         EasyPopup.displayInfo("Succès", "Succès durant la création du jeu de réglages", "Le jeu de réglages `" + setName + "` à bel et bien été sauvegarder!", false);
     }
 
@@ -266,6 +279,7 @@ public class SimulationCtrl implements ICtrl {
 
         // Fill the road settings
         VBox roadSettings = new VBox();
+
         for (InputField in : rd.getProperties()) {
             roadSettings.getChildren().add(
                     new VBox(
@@ -279,7 +293,8 @@ public class SimulationCtrl implements ICtrl {
         roadTab = new Tab("Route",
                 FX.set(new VBox(10,
                         roadSettings
-                ), node -> { VBox.setVgrow(node, Priority.ALWAYS); node.getStyleClass().add("tab_content"); }));
+                ), node -> { VBox.setVgrow(node, Priority.ALWAYS); node.getStyleClass().add("tab_content"); })
+        );
 
         // TODO: Implement and add traffic lights tab
 
@@ -299,12 +314,18 @@ public class SimulationCtrl implements ICtrl {
      */
     public void renderRoads() {
         Circuit c = wrk.getCircuit();
+        // Clear the pre-existing roads
         background.getChildren().clear();
+
         for (Roadable rd : c.getRoads()) {
+            // Draw the road.
             Node node = rd.draw();
+            // Set up the on-click callback
             node.setOnMouseClicked(e -> openRoadEditMenu(rd));
+            // Center the road, (0,0) is in the rendering-zone center
             node.translateXProperty().bind(background.widthProperty().divide(2.f));
             node.translateYProperty().bind(background.heightProperty().divide(2.f));
+            // Add the element to the rendering-zone
             background.getChildren().add(node);
         }
     }
@@ -312,9 +333,12 @@ public class SimulationCtrl implements ICtrl {
     @Override
     public void addVehicle(Vehicle v) {
         Platform.runLater(() -> {
+            // Draw the road
             Node node = v.draw();
+            // Center the road, (0,0) is in the rendering-zone center
             node.translateXProperty().bind(foreground.widthProperty().divide(2.f));
             node.translateYProperty().bind(foreground.heightProperty().divide(2.f));
+            // Add the vehicle to the rendering-zone
             foreground.getChildren().add(node);
         });
     }
@@ -322,10 +346,13 @@ public class SimulationCtrl implements ICtrl {
     @Override
     public void removeVehicle(Vehicle v) {
         Platform.runLater(() -> {
+            Node vn = v.draw();
+            // Find the equivalent vehicle in the rendering-zone.
             for (Node n : foreground.getChildren()) {
-                Node vn = v.draw();
+                // Compare by position, OK for now
                 if (n.getLayoutX() == vn.getLayoutX()
                         && n.getLayoutY() == vn.getLayoutY()) {
+                    // Remove the element
                     foreground.getChildren().remove(n);
                     break;
                 }
@@ -333,11 +360,17 @@ public class SimulationCtrl implements ICtrl {
         });
     }
 
+    /**
+     * Check if the speed factor input is parsable. It is not stored anywhere, it's just a verification!
+     *
+     * @param ev The event.
+     */
     void checkSpeedFactor(ActionEvent ev) {
         try {
             Double.parseDouble(speedFactor.getText());
         } catch (NumberFormatException e) {
             EasyPopup.displayError("Erreur de format", "Un nombre était attendu", "Le format du champ est invalide!", true);
+            // Reset the value
             speedFactor.setText("1");
         }
     }
@@ -360,12 +393,12 @@ public class SimulationCtrl implements ICtrl {
     /**
      * This is the place where the vehicle settings will be put in...
      */
-    private VBox vehicleSettings;
+    private final VBox vehicleSettings;
 
     /**
      * The list of sets that are currently available.
      */
-    private ListView<String> setList;
+    private final ListView<String> setList;
 
     /**
      * The reference to the app.

@@ -4,7 +4,7 @@ package app.roadtrafficsimulator.beans;
  * Represents a traffic light with green and yellow durations.
  * Provides methods to get and set these durations.
  *
- * @autor Elvin Kuci
+ * @author Elvin Kuci
  */
 public class TrafficLight {
     /**

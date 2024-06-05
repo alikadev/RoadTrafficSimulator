@@ -2,10 +2,6 @@ package app.roadtrafficsimulator.beans;
 
 import app.roadtrafficsimulator.exceptions.UnexpectedException;
 import app.roadtrafficsimulator.helper.FX;
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.DoubleProperty;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
@@ -21,7 +17,7 @@ import java.util.List;
  * Represents a car with various physical properties and implements the Vehicle interface.
  * Provides methods to get and set these properties.
  *
- * @autor Elvin Kuci
+ * @author Elvin Kuci
  */
 public class Car implements Vehicle {
 
@@ -110,91 +106,47 @@ public class Car implements Vehicle {
         return c;
     }
 
-    /**
-     * Returns the road the car is on.
-     *
-     * @return the road the car is on
-     */
     @Override
     public Roadable getRoad() {
         return road;
     }
 
-    /**
-     * Sets the road the car is on.
-     *
-     * @param road the new road the car is on
-     */
     @Override
     public void setRoad(Roadable road) {
         this.road = road;
     }
 
-    /**
-     * Returns the position of the car.
-     *
-     * @return the position of the car
-     */
     @Override
     public Vec2 getPosition() {
         return position;
     }
 
-    /**
-     * Sets the position of the car.
-     *
-     * @param offset the new position of the car
-     */
+    @Override
     public void move(Vec2 offset) {
         position.setX(position.getX() + offset.getX());
         position.setY(position.getY() + offset.getY());
     }
 
-    /**
-     * Returns the reaction time of the car.
-     *
-     * @return the reaction time of the car
-     */
     @Override
     public double getReactionTime() {
         return reactionTime.getValue();
     }
 
-    /**
-     * Returns the deceleration speed of the car.
-     *
-     * @return the deceleration speed of the car
-     */
     @Override
     public double getDeceleration() {
         return deceleration.getValue();
     }
 
-    /**
-     * Returns the emergency braking speed of the car.
-     *
-     * @return the emergency braking speed of the car
-     */
     @Override
     public double getBreakingSpeed() {
         return breakingSpeed.getValue();
     }
 
-    /**
-     * Returns the acceleration of the car.
-     *
-     * @return the acceleration of the car
-     */
     @Override
     public double getAcceleration() {
         return acceleration.getValue();
     }
 
-    /**
-     * Returns the security time of the car.
-     *
-     * @return the security time of the car
-     */
     @Override
     public double getSecurityTime() {
         return securityTime.getValue();
@@ -232,32 +184,32 @@ public class Car implements Vehicle {
     /**
      * The reaction time of the car.
      */
-    private InputField reactionTime;
+    private final InputField reactionTime;
 
     /**
      * The deceleration speed of the car.
      */
-    private InputField deceleration;
+    private final InputField deceleration;
 
     /**
      * The emergency braking speed of the car.
      */
-    private InputField breakingSpeed;
+    private final InputField breakingSpeed;
 
     /**
      * The acceleration of the car.
      */
-    private InputField acceleration;
+    private final InputField acceleration;
 
     /**
      * The security time of the car.
      */
-    private InputField securityTime;
+    private final InputField securityTime;
 
     /**
      * The list of all properties of the car.
      */
-    private List<InputField> props;
+    private final List<InputField> props;
 
     /**
      * The current speed of the car

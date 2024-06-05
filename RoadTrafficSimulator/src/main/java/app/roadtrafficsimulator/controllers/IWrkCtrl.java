@@ -1,18 +1,27 @@
 package app.roadtrafficsimulator.controllers;
 
-import app.roadtrafficsimulator.beans.Circuit;
 import app.roadtrafficsimulator.beans.Vehicle;
 
+/**
+ * This interface is used to describe the worker's needs from the controller.
+ *
+ * @author Kuci Elvin
+ */
 public interface IWrkCtrl {
     /**
-     * Render a vehicle on the screen.
+     * Add / Render a vehicle on the screen.
      */
     void addVehicle(Vehicle v);
 
     /**
-     * Destroy a vehicles on the screen.
+     * Remove / Destroy a vehicles on the screen.
      */
     void removeVehicle(Vehicle v);
 
+    /**
+     * Get the simulation's speed factor.
+     *
+     * @return The speed factor.
+     */
     double getSpeedFactor();
 }

@@ -5,6 +5,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 
 /**
  * Represents a vector in the 2D space.
+ *
+ * @author Elvin Kuci
  */
 public class Vec2 {
     /**
@@ -156,9 +158,9 @@ public class Vec2 {
     /**
      * The X coordinate of the vector.
      */
-    private SimpleDoubleProperty x;
+    private final SimpleDoubleProperty x;
     /**
      * The Y coordinate of the vector.
      */
-    private SimpleDoubleProperty y;
+    private final SimpleDoubleProperty y;
 }

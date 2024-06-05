@@ -2,8 +2,6 @@ package app.roadtrafficsimulator.beans;
 
 import app.roadtrafficsimulator.helper.Physics;
 import javafx.scene.Node;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.util.Pair;
 
 import java.util.List;
@@ -12,7 +10,7 @@ import java.util.Map;
 /**
  * Represents the actions that a road should be able to do.
  *
- * @autor Elvin Kuci
+ * @author Elvin Kuci
  */
 public interface Roadable {
     /**
@@ -61,9 +59,9 @@ public interface Roadable {
 
     /**
      * Standard size of a road in Switzerland
-     * See the <a href="https://ge.ch/grandconseil/data/texte/PL12730A.pdf">source</a> here
+     * See the <a href="https://ge.ch/grandconseil/data/texte/PL12730A.pdf">source</a> here (page 10)
      */
-    static double WIDTH = (6.4 * Physics.METER) / 2;
+    double WIDTH = (6.4 * Physics.METER) / 2;
 
     /**
      * Get the road speed limit.

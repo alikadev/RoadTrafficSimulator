@@ -1,8 +1,6 @@
 package app.roadtrafficsimulator;
 
-import app.roadtrafficsimulator.beans.Account;
 import app.roadtrafficsimulator.controllers.ICtrl;
-import app.roadtrafficsimulator.controllers.LoginCtrl;
 import app.roadtrafficsimulator.exceptions.DBException;
 import app.roadtrafficsimulator.helper.EasyPopup;
 import app.roadtrafficsimulator.workers.Wrk;
@@ -10,29 +8,64 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.paint.ImagePattern;
 import javafx.stage.Stage;
 
-import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.net.URL;
 
 /**
- * JavaFX App
+ * This is the JavaFX application class. This is where everything starts for us.
  */
 public class App extends Application {
 
+    /**
+     * The login view path.
+     */
     public static final String LOGIN_VIEW = "views/Login.fxml";
+
+    /**
+     * The simulation view path.
+     */
     public static final String SIMULATION_VIEW = "views/Simulation.fxml";
+
+    /**
+     * The window title.
+     */
     private static final String TITLE = "Road Traffic Simulator";
+
+    /**
+     * The database config for localhost absolute path.
+     */
     public static final String DB_CONFIG_LOCALHOST = "app/roadtrafficsimulator/config/db/localhost.properties";
+
+    /**
+     * The road texture absolute path.
+     */
     public static final String ROAD_TEXTURE = "app/roadtrafficsimulator/textures/road.png";
-    public static final int CAR_TEXTURE_START = 1;
-    public static final int CAR_TEXTURE_END = 6;
+
+    /**
+     * The car texture absolute path base.
+     * The format is `BASE + id + EXTENSION`.
+     */
     public static final String CAR_TEXTURE_BASE = "app/roadtrafficsimulator/textures/car";
+
+    /**
+     * The car texture starting index.
+     */
+    public static final int CAR_TEXTURE_START = 1;
+
+    /**
+     * The car texture last index.
+     */
+    public static final int CAR_TEXTURE_END = 6;
+
+    /**
+     * The car texture extension.
+     */
     public static final String CAR_TEXTURE_EXTENSION = ".png";
 
+    /**
+     * This is the constructor of the Application.
+     */
     public App() {
         super();
 
@@ -69,6 +102,11 @@ public class App extends Application {
         }
     }
 
+    /**
+     * When you need to load/change the view, call that and your dreams will come true...
+     *
+     * @param path The view path. Please, use the constants in top of this class...
+     */
     public void loadView(final String path) {
         // Load the view
         FXMLLoader loader;
@@ -94,9 +132,28 @@ public class App extends Application {
         ctrl.start();
     }
 
+    /**
+     * The controller interface's instance.
+     */
     private ICtrl ctrl;
+
+    /**
+     * The worker's instance
+     */
     private final Wrk wrk;
+
+    /**
+     * The parent view.
+     */
     private Parent view;
+
+    /**
+     * The JavaFX scene...
+     */
     private Scene scene;
+
+    /**
+     * The JavaFX stage...
+     */
     private Stage stage;
 }

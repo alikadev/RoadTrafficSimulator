@@ -13,15 +13,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Popup;
 
 /**
  * The controller of the "Login and SignIn" view of the application.
  *
- * @author kucie
+ * @author Kuci Elvin
  */
 public class LoginCtrl implements ICtrl {
-
     /**
      * Create the login controller.
      */
@@ -29,13 +27,20 @@ public class LoginCtrl implements ICtrl {
         wrk = null;
     }
 
+    @Override
     public void start() {
     }
 
+    @Override
     public void terminate() {
         Platform.exit();
     }
-    
+
+    /**
+     * This methode is called when the user click on the "Login" button.
+     *
+     * @param event The action event.
+     */
     @FXML
     private void logIn(ActionEvent event) {
         boolean failed = false;
@@ -62,12 +67,18 @@ public class LoginCtrl implements ICtrl {
             if (!wrk.verifyAccount(new Account(loginAccount.getText(), loginPasswd.getText())))
                 throw new LoginException("Le nom du compte et/ou le mot de passe ne sont pas le bon");
 
+            // Change the view
             nextView();
         } catch (LoginException | DBException e) {
             EasyPopup.displayError("Erreur", "Erreur durant la connection", e.getMessage(), true);
         }
     }
 
+    /**
+     * This methode is called when the user click on the "Sign In" button.
+     *
+     * @param event The event.
+     */
     @FXML
     private void signIn(ActionEvent event) {
         boolean failed = false;
@@ -102,8 +113,11 @@ public class LoginCtrl implements ICtrl {
 
         // Create the account
         try {
+            // Try to create the account
             Account account = new Account(signinAccount.getText(), signinPasswd.getText());
             wrk.createAccount(account);
+
+            // Change view
             nextView();
         } catch (DBException e) {
             EasyPopup.displayError("Erreur", "Erreur durant la création du compte.", e.getMessage(), true);
@@ -134,6 +148,7 @@ public class LoginCtrl implements ICtrl {
         this.app = app;
     }
 
+    @Override
     public void setWrk(ICtrlWrk wrk) {
         this.wrk = wrk;
     }
@@ -142,30 +157,36 @@ public class LoginCtrl implements ICtrl {
      * The reference to the current worker.
      */
     ICtrlWrk wrk;
+
     /**
      * The reference to the current worker.
      */
     App app;
+
     /**
      * The login's side "Account" textfield
      */
     @FXML
     private TextField loginAccount;
+
     /**
      * The login's side "Password" textfield
      */
     @FXML
     private PasswordField loginPasswd;
+
     /**
      * The signin's side "Account" textfield
      */
     @FXML
     private TextField signinAccount;
+
     /**
      * The signin's side "Password" textfield
      */
     @FXML
     private PasswordField signinPasswd;
+
     /**
      * The signin's side "Password Confirmation" textfield
      */

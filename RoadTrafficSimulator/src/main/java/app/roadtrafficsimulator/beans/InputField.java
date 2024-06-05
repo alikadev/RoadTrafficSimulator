@@ -115,7 +115,7 @@ public class InputField {
     /**
      * The value of the input field.
      */
-    private Property<String> value;
+    private final Property<String> value;
 
     /**
      * The label for the tolerance of the input field.
@@ -125,5 +125,5 @@ public class InputField {
     /**
      * The tolerance of the input field.
      */
-    private Property<String> tolerence;
+    private final Property<String> tolerence;
 }

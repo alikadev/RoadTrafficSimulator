@@ -314,12 +314,12 @@ public class Road implements Roadable {
     /**
      * The traffic input field of the road.
      */
-    private InputField traffic;
+    private final InputField traffic;
 
     /**
      * The direction of the road.
      */
-    private Direction direction;
+    private final Direction direction;
 
     /**
      * The head position of the road.
@@ -329,7 +329,7 @@ public class Road implements Roadable {
     /**
      * The properties of the road.
      */
-    private List<InputField> props;
+    private final List<InputField> props;
 
     /**
      * The next road.

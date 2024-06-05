@@ -5,7 +5,6 @@ import app.roadtrafficsimulator.beans.*;
 import app.roadtrafficsimulator.controllers.IWrkCtrl;
 import app.roadtrafficsimulator.exceptions.DBException;
 import app.roadtrafficsimulator.exceptions.UnexpectedException;
-import app.roadtrafficsimulator.helper.Physics;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -15,29 +14,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * This is the main worker. Its role is mainly to redirect the calls to the good worker.
  *
  * @author kucie
  */
 public class Wrk implements ICtrlWrk, ISimulationWrk {
+    /**
+     * Create the worker.
+     */
     public Wrk() {
         carTextures = new ArrayList<>();
 
-        // Load ressources
+        // Load resources
         try {
-            // Verify ressources URLs
+            // Verify resources URLs
             URL dbConfigURL = getClass().getClassLoader().getResource(App.DB_CONFIG_LOCALHOST);
             if (dbConfigURL == null)
-                throw new UnexpectedException("Ressource not found: " + App.DB_CONFIG_LOCALHOST);
+                throw new UnexpectedException("Resource not found: " + App.DB_CONFIG_LOCALHOST);
 
             URL roadTextureURL = getClass().getClassLoader().getResource(App.ROAD_TEXTURE);
             if (roadTextureURL == null)
-                throw new UnexpectedException("Ressource not found: " + App.ROAD_TEXTURE);
+                throw new UnexpectedException("Resource not found: " + App.ROAD_TEXTURE);
 
             // Verify and load all car textures
             for (int i = App.CAR_TEXTURE_START; i < App.CAR_TEXTURE_END; ++i) {
                 URL carTextureURL = getClass().getClassLoader().getResource(App.CAR_TEXTURE_BASE + i + App.CAR_TEXTURE_EXTENSION);
                 if (carTextureURL == null)
-                    throw new UnexpectedException("Ressource not found: " + App.CAR_TEXTURE_BASE + " @" + i);
+                    throw new UnexpectedException("Resource not found: " + App.CAR_TEXTURE_BASE + " @" + i);
                 carTextures.add(new Image(carTextureURL.openStream()));
             }
 
@@ -55,6 +58,21 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
         simulator = new SimulationWrk(this);
     }
 
+    /**
+     * Starts the worker.
+     *
+     * @throws DBException In case of an exception, this is thrown.
+     */
+    public void start() throws DBException {
+        db.start();
+    }
+
+    /**
+     * Get the road's texture.
+     * An ImageView is given back because the rotation is (nearly) only possible on this class.
+     *
+     * @return The ImageView containing the texture.
+     */
     public ImageView getRoadTexture() {
         ImageView iv = new ImageView(roadTexture);
         iv.setSmooth(false);
@@ -71,12 +89,21 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
         return iv;
     }
 
+    /**
+     * Generate the "straight road circuit"!
+     *
+     * @return The circuit's instance.
+     */
     private Circuit circuitStraightRoad() {
         Circuit circuit = new Circuit();
         ArrayList<Roadable> rds = new ArrayList<>();
+
+        // 2 roads...
         Road rd1 = new Road("RTS-C1-R01",getRoadTexture(), new Vec2(-40,0), Direction.RIGHT, 40, 70);
         Road rd2 = new Road("RTS-C1-R02",getRoadTexture(), new Vec2(0,0), Direction.RIGHT, 40, 30);
+        // Linked together...
         rd1.setNext(rd2);
+        // With some traffic...
         rd1.setTraffic(30);
         rds.add(rd1);
         rds.add(rd2);
@@ -86,10 +113,11 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
         return circuit;
     }
 
-    public void start() throws DBException {
-        db.start();
-    }
-
+    /**
+     * Terminate any action on the worker
+     *
+     * @throws RuntimeException Is case of an error, this will be thrown.
+     */
     public void terminate() throws RuntimeException {
         try {
             db.terminate();
@@ -179,15 +207,47 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
         circuit.getVehicles().remove(v);
     }
 
+    /**
+     * Set the controller's reference.
+     *
+     * @param ctrl The controller's reference.
+     */
     public void setCtrl(IWrkCtrl ctrl) {
         this.ctrl = ctrl;
     }
 
+    /**
+     * The current circuit.
+     */
     private Circuit circuit;
-    private Image roadTexture;
-    private ArrayList<Image> carTextures;
+
+    /**
+     * The road's texture
+     */
+    private final Image roadTexture;
+
+    /**
+     * The list of car's texture.
+     */
+    private final ArrayList<Image> carTextures;
+
+    /**
+     * The currently logged in account.
+     */
     private Account account;
-    private DBWrk db;
+
+    /**
+     * The database worker's instance.
+     */
+    private final DBWrk db;
+
+    /**
+     * The simulation worker's instance.
+     */
+    private final SimulationWrk simulator;
+
+    /**
+     * The controller's reference.
+     */
     private IWrkCtrl ctrl;
-    private SimulationWrk simulator;
 }

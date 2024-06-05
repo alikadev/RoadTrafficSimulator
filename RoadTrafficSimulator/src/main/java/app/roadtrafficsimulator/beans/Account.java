@@ -4,7 +4,7 @@ package app.roadtrafficsimulator.beans;
  * Represents a user account with a name and a password.
  * Provides methods to get and set the name and password.
  *
- * @autor Elvin Kuci
+ * @author Elvin Kuci
  */
 public class Account {
     /**

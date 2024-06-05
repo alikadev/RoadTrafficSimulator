@@ -10,6 +10,8 @@ import java.util.function.Consumer;
 public class FX {
     /**
      * Process the callback to the element type. Should be mainly used to set attributes to JavaFX structure.
+     * The usage is FX.< Type >set(new ..., v -> v.doSomething());
+     *
      * @param node The element
      * @param fn The process that you'll need to do
      * @return The node
