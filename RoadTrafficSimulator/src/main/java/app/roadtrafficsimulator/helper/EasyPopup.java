@@ -1,10 +1,11 @@
 package app.roadtrafficsimulator.helper;
 
 import javafx.scene.control.Alert;
-import javafx.scene.control.DialogPane;
 
 /**
  * Create, manage and display a simple informational popups
+ *
+ * @author Elvin Kuci
  */
 public class EasyPopup {
     /**

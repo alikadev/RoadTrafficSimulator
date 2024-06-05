@@ -25,12 +25,19 @@ SELECT
 	st.id AS setting,
     CASE WHEN acst.value IS NULL THEN st.default ELSE acst.value END AS value
 FROM AccountSetting AS acst
-LEFT JOIN Setting AS st 
+RIGHT JOIN Setting AS st 
 	ON acst.setting = st.id 
 	AND acst.account = "abc" 
 	AND acst.setname = "S3";
-	
--- Insert/update setting for an account et set
+
+-- Check if a setting set exists for an account
+SELECT 1 FROM dual 
+WHERE EXISTS(
+    SELECT 1 FROM accountsetting 
+    WHERE account LIKE 'a' 
+    AND setname LIKE 'test' );
+
+-- Insert/update setting set for an account et set
 -- Warn: value need to be set in values AND at the end
 INSERT INTO AccountSetting VALUES ("abc", "E2", 5.5, "S3") ON DUPLICATE KEY UPDATE value=5.5; 
 
