@@ -367,9 +367,10 @@ public class SimulationCtrl implements ICtrl {
      */
     void checkSpeedFactor(ActionEvent ev) {
         try {
-            Double.parseDouble(speedFactor.getText());
+            double d = Double.parseDouble(speedFactor.getText());
+            if (d < 0) throw new NumberFormatException("La valeur ne peux pas être négative");
         } catch (NumberFormatException e) {
-            EasyPopup.displayError("Erreur de format", "Un nombre était attendu", "Le format du champ est invalide!", true);
+            EasyPopup.displayError("Erreur de format", "Un nombre était attendu", e.getMessage(), true);
             // Reset the value
             speedFactor.setText("1");
         }
