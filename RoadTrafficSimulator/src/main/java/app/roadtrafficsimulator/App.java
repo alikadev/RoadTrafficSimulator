@@ -38,6 +38,11 @@ public class App extends Application {
     public static final String DB_CONFIG_LOCALHOST = "app/roadtrafficsimulator/config/db/localhost.properties";
 
     /**
+     * The external database config absolute path.
+     */
+    public static final String DB_CONFIG_EXTERNAL = "app/roadtrafficsimulator/config/db/external.properties";
+
+    /**
      * The road texture absolute path.
      */
     public static final String ROAD_TEXTURE = "app/roadtrafficsimulator/textures/road.png";
