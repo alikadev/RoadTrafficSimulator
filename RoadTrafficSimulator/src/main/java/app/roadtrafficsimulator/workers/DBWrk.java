@@ -191,7 +191,7 @@ public class DBWrk {
      * @throws DBException In case of an error, this will be thrown.
      */
     public void insertSettingsSet(Account account, SettingsSet set) throws DBException {
-        final String QUERY = "INSERT INTO AccountSetting VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE value=?;";
+        final String QUERY = "INSERT INTO accountsetting VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE value=?;";
         //                                                       ^  ^  ^  ^                                ^
         //                                                 Account  |  |  SetName                       Value
         //                                                SettingName  Value
@@ -215,6 +215,7 @@ public class DBWrk {
                 ps.setDouble(3, value);
                 ps.setString(4, set.getName());
                 ps.setDouble(5, value);
+                System.out.println(key);
 
                 ps.executeUpdate();
             }
@@ -274,8 +275,8 @@ public class DBWrk {
                 "  st.id AS setting, " +
                 // In case of NULL value, use the setting's default one
                 "  CASE WHEN acst.value IS NULL THEN st.default ELSE acst.value END AS value " +
-                "FROM AccountSetting AS acst " +
-                "RIGHT JOIN Setting AS st " +
+                "FROM accountsetting AS acst " +
+                "RIGHT JOIN setting AS st " +
                 "  ON acst.setting = st.id " +
                 "    AND acst.account = ? " +
                 "    AND acst.setname = ?;";

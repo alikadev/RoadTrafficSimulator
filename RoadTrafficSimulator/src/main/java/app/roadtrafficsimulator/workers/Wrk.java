@@ -28,9 +28,9 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
         // Load resources
         try {
             // Verify resources URLs
-            URL dbConfigURL = getClass().getClassLoader().getResource(App.DB_CONFIG_LOCALHOST);
+            URL dbConfigURL = getClass().getClassLoader().getResource(App.DB_CONFIG_EXTERNAL);
             if (dbConfigURL == null)
-                throw new UnexpectedException("Resource not found: " + App.DB_CONFIG_LOCALHOST);
+                throw new UnexpectedException("Resource not found: " + App.DB_CONFIG_EXTERNAL);
 
             URL roadTextureURL = getClass().getClassLoader().getResource(App.ROAD_TEXTURE);
             if (roadTextureURL == null)
@@ -99,8 +99,8 @@ public class Wrk implements ICtrlWrk, ISimulationWrk {
         ArrayList<Roadable> rds = new ArrayList<>();
 
         // 2 roads...
-        Road rd1 = new Road("RTS-C1-R01",getRoadTexture(), new Vec2(-40,0), Direction.RIGHT, 40, 70);
-        Road rd2 = new Road("RTS-C1-R02",getRoadTexture(), new Vec2(0,0), Direction.RIGHT, 40, 30);
+        Road rd1 = new Road("RTF-C1-R01",getRoadTexture(), new Vec2(-40,0), Direction.RIGHT, 40, 70);
+        Road rd2 = new Road("RTF-C1-R02",getRoadTexture(), new Vec2(0,0), Direction.RIGHT, 40, 30);
         // Linked together...
         rd1.setNext(rd2);
         // With some traffic...
